@@ -14,7 +14,9 @@ public class PlayingScene implements GameScene {
     private final int worldHeight;
     private final CharacterType chosenCharacter;
 
-    private Character player;  //  (polimorfismo)
+    private Character player;
+    private Player testPlayer; // TODO: remover quando Warrior/Archer/Mage estiverem prontos
+    private WaveManager waveManager;
     private CopyOnWriteArrayList<Projectile> projectiles;
 
     public PlayingScene(InputHandler input, int worldWidth, int worldHeight,
@@ -32,42 +34,56 @@ public class PlayingScene implements GameScene {
         double startX = worldWidth / 2.0;
         double startY = worldHeight / 2.0;
 
-        // Cria o personagem escolhido no menu!
-//        player = CharacterFactory.create(
-//                chosenCharacter, startX, startY, input, projectiles
-//        );
+        // TODO: quando CharacterFactory/Warrior/Archer/Mage estiverem prontos,
+        // troca essas 2 linhas por:
+        // player = CharacterFactory.create(chosenCharacter, startX, startY, input, projectiles);
+        testPlayer = new Player(startX, startY, input);
+
+        waveManager = new WaveManager(testPlayer, worldWidth, worldHeight);
     }
 
     @Override
     public void onExit() {
         projectiles.clear();
     }
+        @Override
+        public void update() {
+            testPlayer.update(worldWidth, worldHeight);
+            waveManager.update(worldWidth, worldHeight);
 
-    @Override
-    public void update() {
-        player.update(worldWidth, worldHeight);
+            for (Projectile p : projectiles) {
+                p.update(worldWidth, worldHeight);
+            }
+            projectiles.removeIf(p -> !p.isActive());
 
-        for (Projectile p : projectiles) {
-            p.update(worldWidth, worldHeight);
+            // TEMPORÁRIO: ataque de teste por clique, até Warrior/Archer/Mage existirem
+            if (input.consumeMouseClick()) {
+                double attackRange = 60;
+                for (Enemy e : waveManager.getActiveEnemies()) {
+                    double dx = e.getCenterX() - testPlayer.getCenterX();
+                    double dy = e.getCenterY() - testPlayer.getCenterY();
+                    double dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < attackRange) {
+                        e.takeDamage(50);
+                    }
+                }
+            }
         }
-        projectiles.removeIf(p -> !p.isActive());
-    }
 
     @Override
     public void render(Graphics g) {
         g.setColor(Color.BLACK);
         g.fillRect(0, 0, worldWidth, worldHeight);
 
-        player.render(g);
+        testPlayer.render(g);
+        waveManager.render(g);
 
         for (Projectile p : projectiles) {
             p.render(g);
         }
 
-        // HUD provisória (Pessoa D vai fazer bonita)
         g.setColor(Color.WHITE);
-        g.drawString("Personagem: " + chosenCharacter.getDisplayName(), 10, 20);
-//        g.drawString("HP: " + player.getStats().getCurrentHealth() +
-//                "/" + player.getStats().getMaxHealth(), 10, 40);
+        g.drawString("Wave: " + waveManager.getCurrentWave(), 10, 20);
+        g.drawString("HP: " + testPlayer.getHealth(), 10, 40);
     }
 }

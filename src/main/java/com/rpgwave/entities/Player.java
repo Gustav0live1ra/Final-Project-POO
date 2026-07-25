@@ -7,7 +7,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
-public class Player extends Entity {
+public class Player extends Entity implements Damageable {
 
     private final InputHandler input;
     private final int speed;
@@ -19,7 +19,20 @@ public class Player extends Entity {
         this.speed = Constants.PLAYER_SPEED;
         this.sprite = SpriteLoader.load(Constants.PLAYER_SPRITE);
     }
+    private int health = 100;
 
+    @Override
+    public void takeDamage(int amount) {
+        health -= amount;
+        if (health <= 0) {
+            setActive(false);
+        }
+    }
+    @Override
+    public boolean isDead() {
+        return health <= 0;
+    }
+    public int getHealth() { return health; }
 
     // Limitar às bordas da tela
     private void clampToBounds(int worldWidth, int worldHeight) {

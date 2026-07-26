@@ -1,6 +1,7 @@
 package com.rpgwave.core;
 
 import com.rpgwave.entities.*;
+import com.rpgwave.world.TileMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -8,6 +9,7 @@ import java.util.Random;
 public class WaveManager {
 
     private final Entity target;
+    private final TileMap tileMap;
     private final List<Enemy> activeEnemies = new ArrayList<>();
     private final Random random = new Random();
 
@@ -19,10 +21,11 @@ public class WaveManager {
     private final int worldWidth;
     private final int worldHeight;
 
-    public WaveManager(Entity target, int worldWidth, int worldHeight) {
+    public WaveManager(Entity target, int worldWidth, int worldHeight, TileMap tileMap) {
         this.target = target;
         this.worldWidth = worldWidth;
         this.worldHeight = worldHeight;
+        this.tileMap = tileMap;
         this.waveStartTime = System.currentTimeMillis();
     }
 
@@ -62,7 +65,15 @@ public class WaveManager {
         }
 
         for (Enemy e : activeEnemies) {
+            double prevX = e.getPosition().getX();
+            double prevY = e.getPosition().getY();
+
             e.update(worldWidth, worldHeight);
+
+            if (tileMap.isSolidAt(e.getCenterX(), e.getCenterY())) {
+                e.getPosition().setX(prevX);
+                e.getPosition().setY(prevY);
+            }
         }
     }
 
@@ -74,17 +85,34 @@ public class WaveManager {
         for (int i = 0; i < config.flyers; i++) activeEnemies.add(spawnAt(FlyingEnemy.class));
 
         if (config.hasBigBoss) {
-            activeEnemies.add(new BigBossEnemy(worldWidth / 2.0, worldHeight / 2.0, 192, 128, target));
+            activeEnemies.add(new BigBossEnemy(worldWidth / 2.0, worldHeight / 2.0, 96, 96, target));
         }
     }
 
     private Enemy spawnAt(Class<? extends Enemy> type) {
-        double x = random.nextInt(worldWidth);
-        double y = random.nextInt(worldHeight);
+        double[] pos = findValidSpawnPosition(type);
+        double x = pos[0];
+        double y = pos[1];
 
-        if (type == GoblinEnemy.class) return new GoblinEnemy(x, y, 96, 96, target);
-        if (type == AquaticEnemy.class) return new AquaticEnemy(x, y, 64, 64, target);
-        return new FlyingEnemy(x, y, 72, 72, target);
+        if (type == GoblinEnemy.class) return new GoblinEnemy(x, y, 64, 64, target);
+        if (type == AquaticEnemy.class) return new AquaticEnemy(x, y, 40, 92, target);
+        return new FlyingEnemy(x, y, 96, 96, target);
+    }
+
+    private double[] findValidSpawnPosition(Class<? extends Enemy> type) {
+        boolean canSpawnInWater = (type == FlyingEnemy.class);
+
+        for (int attempt = 0; attempt < 50; attempt++) {
+            double x = random.nextInt(worldWidth);
+            double y = random.nextInt(worldHeight);
+
+            if (tileMap.isObstacleAt(x, y)) continue;
+            if (tileMap.isWaterAt(x, y) && !canSpawnInWater) continue;
+
+            return new double[]{x, y};
+        }
+
+        return new double[]{worldWidth / 2.0, worldHeight / 2.0};
     }
 
     public void render(java.awt.Graphics g) {

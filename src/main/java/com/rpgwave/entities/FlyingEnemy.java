@@ -12,19 +12,18 @@ public class FlyingEnemy extends Enemy {
     private double dashDirX, dashDirY;
     private final double dashSpeed = 8.0;
     private long dashStartTime;
-    private final long dashDurationMs = 300; // dash rápido, dura pouco
+    private final long dashDurationMs = 300;
 
     public FlyingEnemy(double x, double y, int width, int height, Entity target) {
         super(x, y, width, height, target,
                 3.0,
-                200,
+                5000,
                 50,
                 9999);
         this.placeholderColor = Color.CYAN;
         this.attackCooldownMs = 1500;
 
-        BufferedImage sheet = SpriteLoader.load("/sprites/Flying Eye sheet.png");
-
+        BufferedImage sheet = SpriteLoader.load("/sprites/flying_eye_sheet.png");
         animations.put(State.IDLE, new Animation(SpriteSheet.sliceRow(sheet, 0, 12, 192, 192), 80));
         animations.put(State.CHASE, new Animation(SpriteSheet.sliceRow(sheet, 0, 12, 192, 192), 60));
         animations.put(State.ATTACK, new Animation(SpriteSheet.sliceRow(sheet, 1, 8, 192, 192), 50));

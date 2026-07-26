@@ -28,7 +28,6 @@ public class Game {
         // TEMPORÁRIO: começa direto com Archer.
         // PESSOA D: implementar MenuScene → CharacterSelectScene → PlayingScene
         CharacterType defaultCharacter = CharacterType.ARCHER;
-
         sceneManager.addScene(GameState.PLAYING,
                 new PlayingScene(input,
                         Constants.WINDOW_WIDTH,

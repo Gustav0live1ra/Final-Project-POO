@@ -23,6 +23,7 @@ public class SkillManager {
 
         return stats.useMana(skill.getManaCost());
     }
+
     public static int useSkillAndCalculateDamage(
             Character character,
             Skill skill,
@@ -37,5 +38,18 @@ public class SkillManager {
                 skill,
                 enemyDefense
         );
+    }
+
+    public static int calculateBasicAttackDamage(
+            Character character,
+            int enemyDefense) {
+
+        if (character == null) {
+            return 0;
+        }
+
+        int damage = character.getStats().getAttack() - enemyDefense;
+
+        return Math.max(damage, 0);
     }
 }

@@ -25,6 +25,7 @@ public abstract class Enemy extends Entity implements Damageable {
     protected long lastAttackTime = 0;
     protected long attackCooldownMs = 1000;
     protected int health = 100;
+    protected int defense = 10;
 
     public Enemy(double x, double y, int width, int height, Entity target,
                  double speed, double detectionRadius, double attackRadius, double territoryRadius) {
@@ -117,5 +118,8 @@ public abstract class Enemy extends Entity implements Damageable {
             g.setColor(placeholderColor);
             g.fillRect((int) position.getX(), (int) position.getY(), width, height);
         }
+    }
+    public int getDefense() {
+        return defense;
     }
 }

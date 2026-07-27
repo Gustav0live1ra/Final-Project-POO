@@ -68,6 +68,7 @@ public class PlayingScene implements GameScene {
                 input
         );
 
+
         // Cria a câmera
         camera = new Camera(
                 viewWidth,
@@ -161,21 +162,92 @@ public class PlayingScene implements GameScene {
 
             for (Enemy e : waveManager.getActiveEnemies()) {
 
-                double dx =
-                        e.getCenterX() - player.getCenterX();
+                double dx = e.getCenterX() - player.getCenterX();
+                double dy = e.getCenterY() - player.getCenterY();
 
-                double dy =
-                        e.getCenterY() - player.getCenterY();
-
-                double dist =
-                        Math.sqrt(dx * dx + dy * dy);
+                double dist = Math.sqrt(dx * dx + dy * dy);
 
                 if (dist < attackRange) {
-                    e.takeDamage(50);
+
+                    int damage = SkillManager.calculateBasicAttackDamage(
+                            player,
+                            e.getDefense()
+                    );
+
+                    e.takeDamage(damage);
+
+                    // Recupera mana ao derrotar um inimigo
+                    if (e.isDead()) {
+                        player.getStats().restoreMana(5);
+
+                        System.out.println(
+                                "Inimigo derrotado! +5 de mana."
+                        );
+                    }
+
+                    System.out.println(
+                            "Ataque básico" +
+                                    " | Dano causado: " + damage +
+                                    " | Mana: " +
+                                    player.getStats().getCurrentMana()
+                    );
+                }
+            }
+        }
+
+        if (input.consumeSkillKey()) {
+
+            double attackRange = 60;
+
+            for (Enemy e : waveManager.getActiveEnemies()) {
+
+                double dx = e.getCenterX() - player.getCenterX();
+                double dy = e.getCenterY() - player.getCenterY();
+
+                double dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist < attackRange) {
+
+                    Skill skill = player.getSkills().get(0);
+
+                    int damage = SkillManager.useSkillAndCalculateDamage(
+                            player,
+                            skill,
+                            e.getDefense()
+                    );
+
+                    if (damage > 0) {
+
+                        e.takeDamage(damage);
+
+                    // Recupera mana apenas se a skill derrotar o inimigo
+                        if (e.isDead()) {
+                            player.getStats().restoreMana(5);
+
+                            System.out.println(
+                                    "Inimigo derrotado! +5 de mana."
+                            );
+                        }
+
+                        System.out.println(
+                                "Skill: " + skill.getName() +
+                                        " | Dano causado: " + damage +
+                                        " | Mana restante: " +
+                                        player.getStats().getCurrentMana()
+                        );
+
+                    } else {
+
+                        System.out.println(
+                                "Mana insuficiente para usar: "
+                                        + skill.getName()
+                        );
+                    }
                 }
             }
         }
     }
+
 
     @Override
     public void render(Graphics g) {

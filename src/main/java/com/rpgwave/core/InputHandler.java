@@ -16,6 +16,12 @@ public class InputHandler implements KeyListener, MouseListener {
     //Skill
     private boolean qPressed;
 
+    // Menu
+    private boolean enterPressed;
+
+    private boolean leftPressed;
+    private boolean rightPressed;
+
     // === Teclado ===
     public boolean isKeyPressed(int keyCode) {
         return pressedKeys.contains(keyCode);
@@ -59,6 +65,30 @@ public class InputHandler implements KeyListener, MouseListener {
         }
         return false;
     }
+    public boolean consumeEnter() {
+
+        if (enterPressed) {
+            enterPressed = false;
+            return true;
+        }
+
+        return false;
+    }
+    public boolean consumeLeft() {
+        if (leftPressed) {
+            leftPressed = false;
+            return true;
+        }
+        return false;
+    }
+
+    public boolean consumeRight() {
+        if (rightPressed) {
+            rightPressed = false;
+            return true;
+        }
+        return false;
+    }
 
     // === Implementação das interfaces ===
     @Override
@@ -68,6 +98,15 @@ public class InputHandler implements KeyListener, MouseListener {
 
         if (e.getKeyCode() == KeyEvent.VK_Q) {
             qPressed = true;
+        }
+        if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+            enterPressed = true;
+        }
+        if (e.getKeyCode() == KeyEvent.VK_LEFT){
+            leftPressed = true;
+        }
+        if (e.getKeyCode() == KeyEvent.VK_RIGHT){
+            rightPressed = true;
         }
     }
 

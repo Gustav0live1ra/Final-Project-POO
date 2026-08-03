@@ -36,6 +36,13 @@ public class PlayingScene implements GameScene {
     private int worldPixelWidth;
     private int worldPixelHeight;
 
+    //Cooldown de Ataque Temporario
+    private long lastBasicAttackTime = 0;
+    private long lastSkillAttackTime = 0;
+
+    private static final long BASIC_ATTACK_COOLDOWN = 300;
+    private static final long SKILL_ATTACK_COOLDOWN = 700;
+
     public PlayingScene(InputHandler input, int viewWidth, int viewHeight,
                         CharacterType chosenCharacter) {
         this.input = input;
@@ -157,6 +164,13 @@ public class PlayingScene implements GameScene {
 
         // Ataque temporário de teste
         if (input.consumeMouseClick()) {
+            long currentTime = System.currentTimeMillis();
+
+            if (currentTime - lastBasicAttackTime < BASIC_ATTACK_COOLDOWN) {
+                return;
+            }
+
+            lastBasicAttackTime = currentTime;
 
             double attackRange = 60;
 
@@ -167,7 +181,7 @@ public class PlayingScene implements GameScene {
 
                 double dist = Math.sqrt(dx * dx + dy * dy);
 
-                if (dist < attackRange) {
+                if (dist < attackRange&& isEnemyInFront(e)) {
 
                     int damage = SkillManager.calculateBasicAttackDamage(
                             player,
@@ -197,6 +211,12 @@ public class PlayingScene implements GameScene {
 
         if (input.consumeSkillKey()) {
 
+            long currentTime = System.currentTimeMillis();
+
+            if (currentTime - lastSkillAttackTime < SKILL_ATTACK_COOLDOWN) {
+                return;
+            }
+
             double attackRange = 60;
 
             for (Enemy e : waveManager.getActiveEnemies()) {
@@ -206,7 +226,7 @@ public class PlayingScene implements GameScene {
 
                 double dist = Math.sqrt(dx * dx + dy * dy);
 
-                if (dist < attackRange) {
+                if (dist < attackRange && isEnemyInFront(e)) {
 
                     Skill skill = player.getSkills().get(0);
 
@@ -217,10 +237,11 @@ public class PlayingScene implements GameScene {
                     );
 
                     if (damage > 0) {
+                        lastSkillAttackTime = currentTime;
 
                         e.takeDamage(damage);
 
-                    // Recupera mana apenas se a skill derrotar o inimigo
+                        // Recupera mana apenas se a skill derrotar o inimigo
                         if (e.isDead()) {
                             player.getStats().restoreMana(5);
 
@@ -329,5 +350,35 @@ public class PlayingScene implements GameScene {
                 10,
                 60
         );
+
+        g.drawString(
+                "Direção: " + player.getDirection(),
+                10,
+                80
+        );
+    }
+
+    private boolean isEnemyInFront(Enemy enemy) {
+
+        double dx = enemy.getCenterX() - player.getCenterX();
+        double dy = enemy.getCenterY() - player.getCenterY();
+
+        switch (player.getDirection()) {
+
+            case UP:
+                return dy < 0;
+
+            case DOWN:
+                return dy > 0;
+
+            case LEFT:
+                return dx < 0;
+
+            case RIGHT:
+                return dx > 0;
+
+            default:
+                return false;
+        }
     }
 }

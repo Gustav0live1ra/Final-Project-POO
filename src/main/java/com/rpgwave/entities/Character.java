@@ -17,6 +17,8 @@ public abstract class Character extends Entity {
 
     // Controle de cooldown de ataque
     protected long lastAttackTime;
+    protected Direction direction;
+
 
     public Character(double x, double y, int width, int height,
                      Stats stats, InputHandler input, String spritePath) {
@@ -27,6 +29,7 @@ public abstract class Character extends Entity {
         this.lastAttackTime = 0;
         this.skills = new ArrayList<>();
         this.levelSystem = new LevelSystem();
+        this.direction = Direction.DOWN;
     }
 
     @Override
@@ -41,15 +44,22 @@ public abstract class Character extends Entity {
 
         if (input.isUp()) {
             position.setY(position.getY() - speed);
+            direction = Direction.UP;
         }
+
         if (input.isDown()) {
             position.setY(position.getY() + speed);
+            direction = Direction.DOWN;
         }
+
         if (input.isLeft()) {
             position.setX(position.getX() - speed);
+            direction = Direction.LEFT;
         }
+
         if (input.isRight()) {
             position.setX(position.getX() + speed);
+            direction = Direction.RIGHT;
         }
     }
 
@@ -64,13 +74,6 @@ public abstract class Character extends Entity {
 
     // Ataque MUDA pra cada personagem, então é abstrato
     protected abstract void handleAttack();
-
-    // Verifica se já passou o cooldown desde o último ataque
-//   protected boolean canAttack() {
-//        long now = System.currentTimeMillis();
-//        long cooldownMs = (long) (stats.getAttackCooldown() * 1000);
-//        return (now - lastAttackTime) >= cooldownMs;
-//    }
 
     @Override
     public void render(Graphics g) {
@@ -112,4 +115,9 @@ public abstract class Character extends Entity {
             stats.increaseAttack(3);
             stats.increaseDefense(2);
         }
+
+        public Direction getDirection() {
+             return direction;
+
+    }
     }

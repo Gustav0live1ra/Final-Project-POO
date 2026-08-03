@@ -32,13 +32,19 @@ public class Game {
                 new PlayingScene(input,
                         Constants.WINDOW_WIDTH,
                         Constants.WINDOW_HEIGHT, defaultCharacter));
+        sceneManager.addScene(GameState.MENU,new MenuScene(input, sceneManager,
+                Constants.WINDOW_WIDTH,
+                Constants.WINDOW_HEIGHT));
+        sceneManager.addScene(GameState.CHARACTER_SELECT, new CharacterSelectScene(input, sceneManager,
+                Constants.WINDOW_WIDTH,
+                Constants.WINDOW_HEIGHT));
 
         // Cenas futuras (Pessoa D):
         // sceneManager.addScene(GameState.MENU, new MenuScene(...));
         // sceneManager.addScene(GameState.PAUSED, new PauseScene(...));
         // sceneManager.addScene(GameState.GAME_OVER, new GameOverScene(...));
 
-        sceneManager.switchTo(GameState.PLAYING);
+        sceneManager.switchTo(GameState.MENU);
 
         // Loop
         gameLoop = new GameLoop(this);

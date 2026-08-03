@@ -19,17 +19,31 @@ public class GameCanvas extends Canvas {
 
     public void render(SceneManager sceneManager) {
         BufferStrategy bs = getBufferStrategy();
+
         if (bs == null) {
             createBufferStrategy(3);
             return;
         }
 
         Graphics g = bs.getDrawGraphics();
+
         try {
+
+            // Limpa a tela antes de desenhar uma nova cena
+            g.clearRect(
+                    0,
+                    0,
+                    getWidth(),
+                    getHeight()
+            );
+
+            // Desenha a cena atual
             sceneManager.render(g);
+
         } finally {
             g.dispose();
         }
+
         bs.show();
     }
 }

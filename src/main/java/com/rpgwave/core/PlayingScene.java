@@ -49,7 +49,10 @@ public class PlayingScene implements GameScene {
         projectiles = new CopyOnWriteArrayList<>();
 
         // Carrega o mapa
-        tileMap = TmxLoader.load("/maps/mapa_principal.tmx", "/maps/");
+        tileMap = TmxLoader.load(
+                "/maps/mapa_principal.tmx",
+                "/maps/"
+        );
 
         worldPixelWidth =
                 tileMap.width * tileMap.tileWidth * TileMap.SCALE;

@@ -6,8 +6,7 @@ import com.rpgwave.world.Camera;
 import com.rpgwave.world.TileMap;
 import com.rpgwave.world.TmxLoader;
 
-import java.awt.Color;
-import java.awt.Graphics;
+import java.awt.*;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -133,6 +132,14 @@ public class PlayingScene implements GameScene {
     @Override
     public void update() {
 
+        if (player.isDead()) {
+            gameOver = true;
+        }
+
+        if (gameOver) {
+            return;
+        }
+
         // Guarda a posição anterior
         double prevX = player.getPosition().getX();
         double prevY = player.getPosition().getY();
@@ -162,20 +169,25 @@ public class PlayingScene implements GameScene {
         for (Projectile p : projectiles) {
             p.update(worldPixelWidth, worldPixelHeight);
         }
-
         projectiles.removeIf(p -> !p.isActive());
 
         // Ataque temporário de teste
         if (input.consumeMouseClick()) {
             long currentTime = System.currentTimeMillis();
 
-            if (currentTime - lastBasicAttackTime < BASIC_ATTACK_COOLDOWN) {
-                return;
+            if (currentTime - lastBasicAttackTime >= BASIC_ATTACK_COOLDOWN) {
+
+                lastBasicAttackTime = currentTime;
             }
 
             lastBasicAttackTime = currentTime;
 
-            double attackRange = 60;
+            int damage = SkillManager.calculateBasicAttackDamage(
+                    player,
+                    0
+            );
+
+            double attackRange = 100;
 
             for (Enemy e : waveManager.getActiveEnemies()) {
 
@@ -184,9 +196,9 @@ public class PlayingScene implements GameScene {
 
                 double dist = Math.sqrt(dx * dx + dy * dy);
 
-                if (dist < attackRange&& isEnemyInFront(e)) {
+                if (dist < attackRange) {
 
-                    int damage = SkillManager.calculateBasicAttackDamage(
+                    int enemydamage = SkillManager.calculateBasicAttackDamage(
                             player,
                             e.getDefense()
                     );
@@ -195,10 +207,15 @@ public class PlayingScene implements GameScene {
 
                     // Recupera mana ao derrotar um inimigo
                     if (e.isDead()) {
+
                         player.getStats().restoreMana(5);
 
+                        player.addExperience(e.getExperienceReward());
+
                         System.out.println(
-                                "Inimigo derrotado! +5 de mana."
+                                "Inimigo derrotado! +" +
+                                        e.getExperienceReward() +
+                                        " XP"
                         );
                     }
 
@@ -217,10 +234,10 @@ public class PlayingScene implements GameScene {
             long currentTime = System.currentTimeMillis();
 
             if (currentTime - lastSkillAttackTime < SKILL_ATTACK_COOLDOWN) {
-                return;
+                    lastBasicAttackTime = currentTime;
             }
 
-            double attackRange = 60;
+            double attackRange = 100;
 
             for (Enemy e : waveManager.getActiveEnemies()) {
 
@@ -229,7 +246,7 @@ public class PlayingScene implements GameScene {
 
                 double dist = Math.sqrt(dx * dx + dy * dy);
 
-                if (dist < attackRange && isEnemyInFront(e)) {
+                if (dist < attackRange) {
 
                     Skill skill = player.getSkills().get(0);
 
@@ -244,12 +261,17 @@ public class PlayingScene implements GameScene {
 
                         e.takeDamage(damage);
 
-                        // Recupera mana apenas se a skill derrotar o inimigo
+                        // Recupera mana e aumenta o level do player
                         if (e.isDead()) {
+
                             player.getStats().restoreMana(5);
 
+                            player.addExperience(e.getExperienceReward());
+
                             System.out.println(
-                                    "Inimigo derrotado! +5 de mana."
+                                    "Inimigo derrotado! +" +
+                                            e.getExperienceReward() +
+                                            " XP"
                             );
                         }
 
@@ -312,6 +334,7 @@ public class PlayingScene implements GameScene {
             p.render(g);
         }
 
+
         // Volta para coordenadas da tela
         g.translate(
                 camera.getX(),
@@ -354,34 +377,22 @@ public class PlayingScene implements GameScene {
                 60
         );
 
-        g.drawString(
-                "Direção: " + player.getDirection(),
-                10,
-                80
-        );
-    }
+        // implementação do Game Over
+        if (gameOver) {
 
-    private boolean isEnemyInFront(Enemy enemy) {
+            g.setColor(Color.RED);
 
-        double dx = enemy.getCenterX() - player.getCenterX();
-        double dy = enemy.getCenterY() - player.getCenterY();
+            g.setFont(
+                    new Font("Arial", Font.BOLD, 48)
+            );
 
-        switch (player.getDirection()) {
-
-            case UP:
-                return dy < 0;
-
-            case DOWN:
-                return dy > 0;
-
-            case LEFT:
-                return dx < 0;
-
-            case RIGHT:
-                return dx > 0;
-
-            default:
-                return false;
+            g.drawString(
+                    "GAME OVER",
+                    viewWidth / 2 - 150,
+                    viewHeight / 2
+            );
         }
     }
+
+    private boolean gameOver = false;
 }

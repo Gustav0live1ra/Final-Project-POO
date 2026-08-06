@@ -7,7 +7,7 @@ import com.rpgwave.utils.SpriteLoader;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
-public abstract class Character extends Entity {
+public abstract class Character extends Entity implements Damageable {
 
     protected final Stats stats;
     protected final InputHandler input;
@@ -101,10 +101,24 @@ public abstract class Character extends Entity {
 
     public void addExperience(int amount) {
 
+        int oldLevel = levelSystem.getLevel();
+
         int levelsGained = levelSystem.addExperience(amount);
 
         for (int i = 0; i < levelsGained; i++) {
             applyLevelUpBonus();
+        }
+
+        if (levelSystem.getLevel() > oldLevel) {
+
+            System.out.println("================================");
+            System.out.println("LEVEL UP!");
+            System.out.println("Nível atual: " + levelSystem.getLevel());
+            System.out.println("HP Máximo: " + stats.getMaxHealth());
+            System.out.println("Mana Máxima: " + stats.getMaxMana());
+            System.out.println("Ataque: " + stats.getAttack());
+            System.out.println("Defesa: " + stats.getDefense());
+            System.out.println("================================");
         }
     }
 
@@ -119,5 +133,14 @@ public abstract class Character extends Entity {
         public Direction getDirection() {
              return direction;
 
+    }
+    @Override
+    public void takeDamage(int amount) {
+        stats.takeDamage(amount);
+    }
+
+    @Override
+    public boolean isDead() {
+        return stats.getCurrentHealth() <= 0;
     }
     }

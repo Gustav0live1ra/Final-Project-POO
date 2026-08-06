@@ -26,6 +26,7 @@ public abstract class Enemy extends Entity implements Damageable {
     protected long attackCooldownMs = 1000;
     protected int health = 100;
     protected int defense = 10;
+    protected int experienceReward = 20;
 
     public Enemy(double x, double y, int width, int height, Entity target,
                  double speed, double detectionRadius, double attackRadius, double territoryRadius) {
@@ -121,5 +122,9 @@ public abstract class Enemy extends Entity implements Damageable {
     }
     public int getDefense() {
         return defense;
+    }
+
+    public int getExperienceReward() {
+        return experienceReward;
     }
 }

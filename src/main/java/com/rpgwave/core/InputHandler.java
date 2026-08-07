@@ -122,6 +122,30 @@ public class InputHandler implements KeyListener, MouseListener {
         }
         return false;
     }
+    public boolean consumeKey(int keyCode) {
+        // Se a tecla estiver pressionada
+        if (pressedKeys.contains(keyCode)) {
+            // Remove ela do set (consome o evento)
+            pressedKeys.remove(keyCode);
+
+            // Se for uma das teclas de controle que têm variáveis booleanas, também reseta elas
+            if (keyCode == KeyEvent.VK_ENTER) enterPressed = false;
+            if (keyCode == KeyEvent.VK_ESCAPE) escPressed = false;
+            if (keyCode == KeyEvent.VK_M) mPressed = false;
+            if (keyCode == KeyEvent.VK_Q) qPressed = false;
+            if (keyCode == KeyEvent.VK_LEFT) leftPressed = false;
+            if (keyCode == KeyEvent.VK_RIGHT) rightPressed = false;
+            if (keyCode == KeyEvent.VK_UP) upPressed = false;
+            if (keyCode == KeyEvent.VK_DOWN) downPressed = false;
+            if (keyCode == KeyEvent.VK_W) upPressed = false;
+            if (keyCode == KeyEvent.VK_S) downPressed = false;
+            if (keyCode == KeyEvent.VK_A) leftPressed = false;
+            if (keyCode == KeyEvent.VK_D) rightPressed = false;
+
+            return true; // A tecla foi consumida
+        }
+        return false; // A tecla não estava pressionada
+    }
 
     // === Implementação das interfaces ===
     @Override

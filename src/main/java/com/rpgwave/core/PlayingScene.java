@@ -153,10 +153,7 @@ public class PlayingScene implements GameScene {
         }
 
         if (player.isDead()) {
-            gameOver = true;
-        }
-
-        if (gameOver) {
+            sceneManager.switchTo(GameState.GAME_OVER);
             return;
         }
 
@@ -396,22 +393,6 @@ public class PlayingScene implements GameScene {
                 10,
                 60
         );
-
-        // implementação do Game Over
-        if (gameOver) {
-
-            g.setColor(Color.RED);
-
-            g.setFont(
-                    new Font("Arial", Font.BOLD, 48)
-            );
-
-            g.drawString(
-                    "GAME OVER",
-                    viewWidth / 2 - 150,
-                    viewHeight / 2
-            );
-        }
     }
 
     private boolean gameOver = false;

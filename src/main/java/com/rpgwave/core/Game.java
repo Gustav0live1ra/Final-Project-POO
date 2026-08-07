@@ -4,6 +4,7 @@ import com.rpgwave.entities.CharacterType;
 import com.rpgwave.utils.Constants;
 
 public class Game {
+    public static CharacterType currentCharacter = CharacterType.ARCHER;
 
     private final GameCanvas canvas;
     private final Window window;
@@ -41,6 +42,13 @@ public class Game {
         sceneManager.addScene(GameState.PAUSED, new PauseScene(input, sceneManager,
                 Constants.WINDOW_WIDTH,
                 Constants.WINDOW_HEIGHT));
+        sceneManager.addScene(GameState.GAME_OVER,
+                new GameOverScene(
+                        input,
+                        sceneManager,
+                        Constants.WINDOW_WIDTH,
+                        Constants.WINDOW_HEIGHT
+                ));
 
         // Cenas futuras (Pessoa D):
         // sceneManager.addScene(GameState.MENU, new MenuScene(...));

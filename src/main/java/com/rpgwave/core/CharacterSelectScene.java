@@ -168,6 +168,7 @@ public class CharacterSelectScene implements GameScene {
         }
 
         if (input.consumeEnter()) {
+            Game.currentCharacter = selectedCharacter;
             sceneManager.addScene(
                     GameState.PLAYING,
                     new PlayingScene(

@@ -25,6 +25,8 @@ public class PlayingScene implements GameScene {
     private final int viewWidth;
     private final int viewHeight;
     private final CharacterType chosenCharacter;
+    private final SceneManager sceneManager;
+    private boolean gameInitialized = false;
 
     private Character player;
     private WaveManager waveManager;
@@ -35,16 +37,23 @@ public class PlayingScene implements GameScene {
     private int worldPixelWidth;
     private int worldPixelHeight;
 
-    //Cooldown de Ataque Temporario
+
+    // Cooldown de Ataque Temporário
     private long lastBasicAttackTime = 0;
     private long lastSkillAttackTime = 0;
 
     private static final long BASIC_ATTACK_COOLDOWN = 300;
     private static final long SKILL_ATTACK_COOLDOWN = 700;
 
-    public PlayingScene(InputHandler input, int viewWidth, int viewHeight,
-                        CharacterType chosenCharacter) {
+    public PlayingScene(
+            InputHandler input,
+            SceneManager sceneManager,
+            int viewWidth,
+            int viewHeight,
+            CharacterType chosenCharacter) {
+
         this.input = input;
+        this.sceneManager = sceneManager;
         this.viewWidth = viewWidth;
         this.viewHeight = viewHeight;
         this.chosenCharacter = chosenCharacter;
@@ -52,6 +61,12 @@ public class PlayingScene implements GameScene {
 
     @Override
     public void onEnter() {
+        if (gameInitialized){
+            return;
+        }
+
+        gameInitialized = true;
+
         projectiles = new CopyOnWriteArrayList<>();
 
         // Carrega o mapa
@@ -131,6 +146,11 @@ public class PlayingScene implements GameScene {
 
     @Override
     public void update() {
+        // Pausa do jogo
+        if (input.consumeEscape()){
+            sceneManager.switchTo(GameState.PAUSED);
+            return;
+        }
 
         if (player.isDead()) {
             gameOver = true;

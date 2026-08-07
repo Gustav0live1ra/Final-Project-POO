@@ -29,13 +29,16 @@ public class Game {
         // PESSOA D: implementar MenuScene → CharacterSelectScene → PlayingScene
         CharacterType defaultCharacter = CharacterType.ARCHER;
         sceneManager.addScene(GameState.PLAYING,
-                new PlayingScene(input,
+                new PlayingScene(input, sceneManager,
                         Constants.WINDOW_WIDTH,
                         Constants.WINDOW_HEIGHT, defaultCharacter));
         sceneManager.addScene(GameState.MENU,new MenuScene(input, sceneManager,
                 Constants.WINDOW_WIDTH,
                 Constants.WINDOW_HEIGHT));
         sceneManager.addScene(GameState.CHARACTER_SELECT, new CharacterSelectScene(input, sceneManager,
+                Constants.WINDOW_WIDTH,
+                Constants.WINDOW_HEIGHT));
+        sceneManager.addScene(GameState.PAUSED, new PauseScene(input, sceneManager,
                 Constants.WINDOW_WIDTH,
                 Constants.WINDOW_HEIGHT));
 

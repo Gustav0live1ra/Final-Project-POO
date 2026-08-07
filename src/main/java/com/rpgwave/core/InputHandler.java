@@ -13,14 +13,19 @@ public class InputHandler implements KeyListener, MouseListener {
     private int mouseX, mouseY;
     private boolean mouseClicked;
 
-    //Skill
+    // Combate
     private boolean qPressed;
 
     // Menu
     private boolean enterPressed;
-
     private boolean leftPressed;
     private boolean rightPressed;
+    private boolean upPressed;
+    private boolean downPressed;
+
+    // Controle
+    private boolean escPressed;
+    private boolean mPressed;
 
     // === Teclado ===
     public boolean isKeyPressed(int keyCode) {
@@ -89,6 +94,34 @@ public class InputHandler implements KeyListener, MouseListener {
         }
         return false;
     }
+    public boolean consumeEscape() {
+        if (escPressed) {
+            escPressed = false;
+            return true;
+        }
+        return false;
+    }
+    public boolean consumeM(){
+        if (mPressed){
+            mPressed = false;
+            return true;
+        }
+        return false;
+    }
+    public boolean consumeUp() {
+        if (upPressed) {
+            upPressed = false;
+            return true;
+        }
+        return false;
+    }
+    public boolean consumeDown() {
+        if (downPressed) {
+            downPressed = false;
+            return true;
+        }
+        return false;
+    }
 
     // === Implementação das interfaces ===
     @Override
@@ -107,6 +140,23 @@ public class InputHandler implements KeyListener, MouseListener {
         }
         if (e.getKeyCode() == KeyEvent.VK_RIGHT){
             rightPressed = true;
+        }
+        if (e.getKeyCode() == KeyEvent.VK_ESCAPE){
+            escPressed = true;
+        }
+        if (e.getKeyCode() == KeyEvent.VK_M){
+            mPressed = true;
+        }
+        if (e.getKeyCode() == KeyEvent.VK_UP ||
+                e.getKeyCode() == KeyEvent.VK_W) {
+
+            upPressed = true;
+        }
+
+        if (e.getKeyCode() == KeyEvent.VK_DOWN ||
+                e.getKeyCode() == KeyEvent.VK_S) {
+
+            downPressed = true;
         }
     }
 

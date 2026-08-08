@@ -12,9 +12,12 @@ public class SceneManager {
     private GameScene currentScene;
     private GameState currentState;
     private MainAudioManager audioManager;
+    private InputHandler input;
 
-    public SceneManager(){
+    public SceneManager(InputHandler input){
         audioManager = new MainAudioManager();
+        this.input = input;
+
     }
 
     public void addScene(GameState state, GameScene scene) {
@@ -32,6 +35,8 @@ public class SceneManager {
         currentScene = next;
         currentState = state;
         audioManager.onSceneChanged(state);
+
+        input.clearAllInputs(); //limpa o buffer de entrada a cada mudança de cena
         currentScene.onEnter();
     }
 

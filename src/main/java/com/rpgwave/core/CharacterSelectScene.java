@@ -4,6 +4,7 @@ import com.rpgwave.entities.CharacterType;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -40,7 +41,7 @@ public class CharacterSelectScene implements GameScene {
         loadImages();
     }
 
-    // ============ MÉTODO PARA CARREGAR IMAGENS ============
+    // ============ METODO PARA CARREGAR IMAGENS ============
     private void loadImages() {
         try {
             warriorImage = ImageIO.read(getClass().getResourceAsStream("/sprites/Guerreiro.png"));
@@ -88,7 +89,7 @@ public class CharacterSelectScene implements GameScene {
         return img;
     }
 
-    // ============ MÉTODO COM ZOOM INDIVIDUAL POR PERSONAGEM ============
+    // ============ METODO COM ZOOM INDIVIDUAL POR PERSONAGEM ============
     private BufferedImage cropToCircle(BufferedImage srcImage, int diameter, CharacterType type) {
         BufferedImage destImage = new BufferedImage(diameter, diameter, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = destImage.createGraphics();
@@ -153,14 +154,14 @@ public class CharacterSelectScene implements GameScene {
     public void update(){
         selectionPulse += 0.05f;
 
-        if(input.consumeRight()){
+        if(input.consumeKey(KeyEvent.VK_RIGHT)){
             selectedCharacter = CharacterType.values()
                     [(selectedCharacter.ordinal() + 1)
                     % CharacterType.values().length];
             selectionPulse = 0f;
         }
 
-        if(input.consumeLeft()){
+        if(input.consumeKey(KeyEvent.VK_LEFT)){
             selectedCharacter = CharacterType.values()
                     [(selectedCharacter.ordinal() - 1 + CharacterType.values().length)
                     % CharacterType.values().length];
@@ -197,7 +198,7 @@ public class CharacterSelectScene implements GameScene {
         }
     }
 
-    // ============ MÉTODOS DE DESENHO ============
+    // ============ METODOS DE DESENHO ============
 
     private void drawBackground(Graphics g){
         Graphics2D g2d = (Graphics2D) g;

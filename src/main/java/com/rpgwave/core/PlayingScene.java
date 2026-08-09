@@ -31,6 +31,10 @@ public class PlayingScene implements GameScene {
     private Character player;
     private WaveManager waveManager;
     private CopyOnWriteArrayList<Projectile> projectiles;
+    private CopyOnWriteArrayList<AttackEffect> attackEffects;
+    private CopyOnWriteArrayList<PlayerProjectile> playerProjectiles;
+    private CopyOnWriteArrayList<SwordSlashEffect> swordSlashEffects;
+    private CopyOnWriteArrayList<HeavySlashEffect> heavySlashEffects;
 
     private TileMap tileMap;
     private Camera camera;
@@ -68,6 +72,10 @@ public class PlayingScene implements GameScene {
         gameInitialized = true;
 
         projectiles = new CopyOnWriteArrayList<>();
+        playerProjectiles = new CopyOnWriteArrayList<>();
+        swordSlashEffects =
+                new CopyOnWriteArrayList<>();
+        heavySlashEffects = new CopyOnWriteArrayList<>();
 
         // Carrega o mapa
         tileMap = TmxLoader.load(
@@ -108,6 +116,8 @@ public class PlayingScene implements GameScene {
                 worldPixelHeight,
                 tileMap
         );
+
+        attackEffects = new CopyOnWriteArrayList<>();
     }
 
     private double[] findSafeSpawn() {
@@ -182,11 +192,41 @@ public class PlayingScene implements GameScene {
                 worldPixelHeight
         );
 
-        // Atualiza projéteis
+        // Atualiza projéteis dos inimigos
         for (Projectile p : projectiles) {
             p.update(worldPixelWidth, worldPixelHeight);
         }
         projectiles.removeIf(p -> !p.isActive());
+
+        // Atualiza projeteis dos players
+        for (PlayerProjectile p : playerProjectiles) {
+            p.update(worldPixelWidth, worldPixelHeight);
+        }
+
+        playerProjectiles.removeIf(p -> !p.isActive());
+
+        for (SwordSlashEffect effect : swordSlashEffects) {
+            effect.update(
+                    worldPixelWidth,
+                    worldPixelHeight
+            );
+        }
+
+        swordSlashEffects.removeIf(
+                effect -> !effect.isActive()
+        );
+
+        for (HeavySlashEffect effect : heavySlashEffects) {
+
+            effect.update(
+                    worldPixelWidth,
+                    worldPixelHeight
+            );
+        }
+
+        heavySlashEffects.removeIf(
+                effect -> !effect.isActive()
+        );
 
         // Ataque temporário de teste
         if (input.consumeMouseClick()) {
@@ -221,6 +261,46 @@ public class PlayingScene implements GameScene {
                     );
 
                     e.takeDamage(damage);
+
+                    if (chosenCharacter == CharacterType.ARCHER) {
+
+                        playerProjectiles.add(
+                                new PlayerProjectile(
+                                        player.getCenterX(),
+                                        player.getCenterY(),
+                                        e.getCenterX(),
+                                        e.getCenterY(),
+                                        damage,
+                                        8,
+                                        "/sprites/Arrow.png"
+                                )
+                        );
+                    }
+
+                    if (chosenCharacter == CharacterType.MAGE) {
+
+                        playerProjectiles.add(
+                                new PlayerProjectile(
+                                        player.getCenterX(),
+                                        player.getCenterY(),
+                                        e.getCenterX(),
+                                        e.getCenterY(),
+                                        damage,
+                                        6,
+                                        "/sprites/Fireball.png"
+                                )
+                        );
+                    }
+
+                        if (chosenCharacter == CharacterType.WARRIOR) {
+
+                            swordSlashEffects.add(
+                                    new SwordSlashEffect(
+                                            e.getCenterX(),
+                                            e.getCenterY()
+                                    )
+                            );
+                    }
 
                     // Recupera mana ao derrotar um inimigo
                     if (e.isDead()) {
@@ -277,6 +357,16 @@ public class PlayingScene implements GameScene {
                         lastSkillAttackTime = currentTime;
 
                         e.takeDamage(damage);
+
+                        if (chosenCharacter == CharacterType.WARRIOR) {
+
+                            new HeavySlashEffect(
+                                    player.getCenterX(),
+                                    player.getCenterY(),
+                                    e.getCenterX(),
+                                    e.getCenterY()
+                            );
+                        }
 
                         // Recupera mana e aumenta o level do player
                         if (e.isDead()) {
@@ -346,11 +436,23 @@ public class PlayingScene implements GameScene {
         // Inimigos
         waveManager.render(g);
 
-        // Projéteis
+        // Projéteis Inimigos
         for (Projectile p : projectiles) {
             p.render(g);
         }
 
+        // Projeteis Jogador
+        for (PlayerProjectile p : playerProjectiles) {
+            p.render(g);
+        }
+
+        for (SwordSlashEffect effect : swordSlashEffects) {
+            effect.render(g);
+        }
+
+        for (HeavySlashEffect effect : heavySlashEffects) {
+            effect.render(g);
+        }
 
         // Volta para coordenadas da tela
         g.translate(

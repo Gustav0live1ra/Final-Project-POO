@@ -1,5 +1,7 @@
 package com.rpgwave.core;
 
+import com.rpgwave.audio.MainAudioManager;
+
 import java.awt.Graphics;
 import java.util.EnumMap;
 import java.util.Map;
@@ -9,6 +11,14 @@ public class SceneManager {
     private final Map<GameState, GameScene> scenes = new EnumMap<>(GameState.class);
     private GameScene currentScene;
     private GameState currentState;
+    private MainAudioManager audioManager;
+    private InputHandler input;
+
+    public SceneManager(InputHandler input){
+        audioManager = new MainAudioManager();
+        this.input = input;
+
+    }
 
     public void addScene(GameState state, GameScene scene) {
         scenes.put(state, scene);
@@ -24,6 +34,9 @@ public class SceneManager {
         }
         currentScene = next;
         currentState = state;
+        audioManager.onSceneChanged(state);
+
+        input.clearAllInputs(); //limpa o buffer de entrada a cada mudança de cena
         currentScene.onEnter();
     }
 

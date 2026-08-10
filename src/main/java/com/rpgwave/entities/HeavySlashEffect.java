@@ -1,22 +1,34 @@
 package com.rpgwave.entities;
 
-import com.rpgwave.utils.SpriteLoader;
-
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStream;
+
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.ImageReadParam;
+import javax.imageio.ImageTypeSpecifier;
+import javax.imageio.stream.ImageInputStream;
 
 public class HeavySlashEffect extends Entity {
 
-    private final BufferedImage spriteSheet;
+    private static final int EFFECT_WIDTH = 70;
+    private static final int EFFECT_HEIGHT = 70;
 
-    private static final int FRAME_WIDTH = 126;
-    private static final int FRAME_HEIGHT = 356;
+    private static final int FRAME_COUNT = 9;
 
-    private static final int EFFECT_WIDTH = 100;
-    private static final int EFFECT_HEIGHT = 100;
+    private static final long FRAME_DURATION = 80;
+
+    private final BufferedImage[] frames;
 
     private final double angle;
+
+    private int currentFrame = 0;
+
+    private long lastFrameTime;
 
     public HeavySlashEffect(
             double x,
@@ -25,19 +37,73 @@ public class HeavySlashEffect extends Entity {
             double targetY) {
 
         super(
-                x - EFFECT_WIDTH / 2.0,
-                y - EFFECT_HEIGHT / 2.0,
+                targetX - EFFECT_WIDTH / 2.0,
+                targetY - EFFECT_HEIGHT / 2.0,
                 EFFECT_WIDTH,
                 EFFECT_HEIGHT
         );
-
-        spriteSheet =
-                SpriteLoader.load("/sprites/HeavySlash.png");
+        frames = loadGifFrames(
+                "/sprites/slash_fire.gif"
+                );
 
         double dx = targetX - x;
         double dy = targetY - y;
 
         angle = Math.atan2(dy, dx);
+
+        lastFrameTime =
+                System.currentTimeMillis();
+    }
+
+    private BufferedImage[] loadGifFrames(
+            String path) {
+
+        try {
+
+            InputStream input =
+                    HeavySlashEffect.class
+                            .getResourceAsStream(path);
+
+            if (input == null) {
+                throw new RuntimeException(
+                        "Sprite não encontrado: " + path
+                );
+            }
+
+            ImageInputStream imageInput =
+                    ImageIO.createImageInputStream(input);
+
+            ImageReader reader =
+                    ImageIO.getImageReadersByFormatName("gif")
+                            .next();
+
+            reader.setInput(imageInput);
+
+            int frameCount =
+                    reader.getNumImages(true);
+
+            BufferedImage[] result =
+                    new BufferedImage[frameCount];
+
+            for (int i = 0; i < frameCount; i++) {
+
+                result[i] =
+                        reader.read(i);
+            }
+
+            reader.dispose();
+            imageInput.close();
+            input.close();
+
+            return result;
+
+        } catch (IOException e) {
+
+            throw new RuntimeException(
+                    "Erro ao carregar GIF: " + path,
+                    e
+            );
+        }
     }
 
     @Override
@@ -45,25 +111,32 @@ public class HeavySlashEffect extends Entity {
             int worldWidth,
             int worldHeight) {
 
-        // Apenas teste visual por enquanto.
-        // O efeito fica ativo.
+        long currentTime =
+                System.currentTimeMillis();
+
+        if (currentTime - lastFrameTime
+                >= FRAME_DURATION) {
+
+            currentFrame++;
+
+            lastFrameTime = currentTime;
+
+            if (currentFrame >= frames.length) {
+
+                active = false;
+            }
+        }
     }
 
     @Override
     public void render(Graphics g) {
 
-        if (spriteSheet == null) {
+        if (!active || frames.length == 0) {
             return;
         }
 
-        // Primeiro frame
         BufferedImage frame =
-                spriteSheet.getSubimage(
-                        0,
-                        69,
-                        126,
-                        195
-                );
+                frames[currentFrame];
 
         Graphics2D g2 =
                 (Graphics2D) g.create();
@@ -71,14 +144,29 @@ public class HeavySlashEffect extends Entity {
         try {
 
             int centerX =
-                    (int) position.getX() + width / 2;
+                    (int) position.getX()
+                            + width / 2;
 
             int centerY =
-                    (int) position.getY() + height / 2;
+                    (int) position.getY()
+                            + height / 2;
 
-            g2.translate(centerX, centerY);
+            g2.translate(
+                    centerX,
+                    centerY
+            );
 
-            g2.rotate(angle);
+            /*
+             * O sprite original está
+             * inclinado na diagonal.
+             *
+             * Esse ajuste pode ser alterado
+             * depois caso a direção fique
+             * invertida.
+             */
+            g2.rotate(
+                    angle
+            );
 
             g2.drawImage(
                     frame,
@@ -90,6 +178,7 @@ public class HeavySlashEffect extends Entity {
             );
 
         } finally {
+
             g2.dispose();
         }
     }

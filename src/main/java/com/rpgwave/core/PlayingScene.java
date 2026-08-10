@@ -9,6 +9,7 @@ import com.rpgwave.world.TmxLoader;
 import java.awt.*;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
+import com.rpgwave.entities.MageSkillProjectile;
 
 public class PlayingScene implements GameScene {
 
@@ -35,6 +36,9 @@ public class PlayingScene implements GameScene {
     private CopyOnWriteArrayList<PlayerProjectile> playerProjectiles;
     private CopyOnWriteArrayList<SwordSlashEffect> swordSlashEffects;
     private CopyOnWriteArrayList<HeavySlashEffect> heavySlashEffects;
+    private Hud hud;
+    private CopyOnWriteArrayList<ArcherSkillProjectile> archerSkillProjectiles;
+    private CopyOnWriteArrayList<MageSkillProjectile> mageSkillProjectiles;
 
     private TileMap tileMap;
     private Camera camera;
@@ -73,9 +77,10 @@ public class PlayingScene implements GameScene {
 
         projectiles = new CopyOnWriteArrayList<>();
         playerProjectiles = new CopyOnWriteArrayList<>();
-        swordSlashEffects =
-                new CopyOnWriteArrayList<>();
+        swordSlashEffects = new CopyOnWriteArrayList<>();
         heavySlashEffects = new CopyOnWriteArrayList<>();
+        archerSkillProjectiles = new CopyOnWriteArrayList<>();
+        mageSkillProjectiles = new CopyOnWriteArrayList<>();
 
         // Carrega o mapa
         tileMap = TmxLoader.load(
@@ -118,6 +123,7 @@ public class PlayingScene implements GameScene {
         );
 
         attackEffects = new CopyOnWriteArrayList<>();
+        hud = new Hud();
     }
 
     private double[] findSafeSpawn() {
@@ -226,6 +232,27 @@ public class PlayingScene implements GameScene {
 
         heavySlashEffects.removeIf(
                 effect -> !effect.isActive()
+        );
+
+        for (ArcherSkillProjectile p : archerSkillProjectiles) {
+            p.update(
+                    worldPixelWidth,
+                    worldPixelHeight
+            );
+        }
+
+        archerSkillProjectiles.removeIf(
+                p -> !p.isActive()
+        );
+        for (MageSkillProjectile p : mageSkillProjectiles) {
+            p.update(
+                    worldPixelWidth,
+                    worldPixelHeight
+            );
+        }
+
+        mageSkillProjectiles.removeIf(
+                p -> !p.isActive()
         );
 
         // Ataque temporário de teste
@@ -360,11 +387,36 @@ public class PlayingScene implements GameScene {
 
                         if (chosenCharacter == CharacterType.WARRIOR) {
 
-                            new HeavySlashEffect(
-                                    player.getCenterX(),
-                                    player.getCenterY(),
-                                    e.getCenterX(),
-                                    e.getCenterY()
+                            heavySlashEffects.add(
+                                    new HeavySlashEffect(
+                                            player.getCenterX(),
+                                            player.getCenterY(),
+                                            e.getCenterX(),
+                                            e.getCenterY()
+                                    )
+                            );
+                        }
+
+                                if (chosenCharacter == CharacterType.ARCHER) {
+
+                                    archerSkillProjectiles.add(
+                                            new ArcherSkillProjectile(
+                                                    player.getCenterX(),
+                                                    player.getCenterY(),
+                                                    e.getCenterX(),
+                                                    e.getCenterY()
+                                            )
+                                    );
+                                }
+                        if (chosenCharacter == CharacterType.MAGE) {
+
+                            mageSkillProjectiles.add(
+                                    new MageSkillProjectile(
+                                            player.getCenterX(),
+                                            player.getCenterY(),
+                                            e.getCenterX(),
+                                            e.getCenterY()
+                                    )
                             );
                         }
 
@@ -454,6 +506,13 @@ public class PlayingScene implements GameScene {
             effect.render(g);
         }
 
+        for (ArcherSkillProjectile p : archerSkillProjectiles) {
+            p.render(g);
+        }
+        for (MageSkillProjectile p : mageSkillProjectiles) {
+            p.render(g);
+        }
+
         // Volta para coordenadas da tela
         g.translate(
                 camera.getX(),
@@ -471,29 +530,14 @@ public class PlayingScene implements GameScene {
         );
 
         // HUD
-        g.setColor(Color.WHITE);
-
-        g.drawString(
-                "Personagem: "
-                        + chosenCharacter.getDisplayName(),
-                10,
-                20
-        );
-
-        g.drawString(
-                "Wave: "
-                        + waveManager.getCurrentWave(),
-                10,
-                40
-        );
-
-        g.drawString(
-                "HP: "
-                        + player.getStats().getCurrentHealth()
-                        + "/"
-                        + player.getStats().getMaxHealth(),
-                10,
-                60
+        hud.render(
+                g,
+                player,
+                chosenCharacter,
+                waveManager.getCurrentWave(),
+                waveManager.getActiveEnemies().size(),
+                viewWidth,
+                viewHeight
         );
     }
 

@@ -7,34 +7,55 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
-public class PlayerProjectile extends Entity {
+public class ArcherSkillProjectile extends Entity {
 
+    private final BufferedImage sprite;
     private final double velocityX;
     private final double velocityY;
-    private final int damage;
-    private final BufferedImage sprite;
     private final double angle;
 
-    public PlayerProjectile(
+    public ArcherSkillProjectile(
             double startX,
             double startY,
             double targetX,
-            double targetY,
-            int damage,
-            double speed,
-            String spritePath) {
+            double targetY) {
 
         super(
-                startX,
-                startY,
+                startX - Constants.PROJECTILE_WIDTH / 2.0,
+                startY - Constants.PROJECTILE_HEIGHT / 2.0,
                 Constants.PROJECTILE_WIDTH,
                 Constants.PROJECTILE_HEIGHT
         );
 
-        this.damage = damage;
+        double dx = targetX - startX;
+        double dy = targetY - startY;
+
+        double distance = Math.sqrt(
+                dx * dx + dy * dy
+        );
+
+        double speed = 10;
+
+        if (distance == 0) {
+
+            this.velocityX = 0;
+            this.velocityY = 0;
+
+        } else {
+
+            this.velocityX =
+                    (dx / distance) * speed;
+
+            this.velocityY =
+                    (dy / distance) * speed;
+        }
+        this.angle = Math.atan2(
+                this.velocityY,
+                this.velocityX
+        );
 
         BufferedImage spriteSheet =
-                SpriteLoader.load(spritePath);
+                SpriteLoader.load("/sprites/skillarcher.png");
 
         if (spriteSheet != null
                 && spriteSheet.getWidth() >= 32
@@ -52,32 +73,6 @@ public class PlayerProjectile extends Entity {
 
             this.sprite = null;
         }
-
-        double dx = targetX - startX;
-        double dy = targetY - startY;
-
-        double distance =
-                Math.sqrt(dx * dx + dy * dy);
-
-        if (distance == 0) {
-
-            this.velocityX = 0;
-            this.velocityY = 0;
-
-        } else {
-
-            this.velocityX =
-                    (dx / distance) * speed;
-
-            this.velocityY =
-                    (dy / distance) * speed;
-        }
-
-        this.angle =
-                Math.atan2(
-                        this.velocityY,
-                        this.velocityX
-                );
     }
 
     @Override
@@ -126,9 +121,9 @@ public class PlayerProjectile extends Entity {
                     centerX,
                     centerY
             );
-            g2.rotate(
-                    angle + Math.PI / 2
-            );
+
+            g2.rotate(angle);
+            
 
             int renderWidth = 32;
             int renderHeight = 32;
@@ -146,9 +141,5 @@ public class PlayerProjectile extends Entity {
 
             g2.dispose();
         }
-    }
-
-    public int getDamage() {
-        return damage;
     }
 }

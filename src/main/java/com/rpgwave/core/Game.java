@@ -26,8 +26,6 @@ public class Game {
         // Cenas
         sceneManager = new SceneManager();
 
-        // TEMPORÁRIO: começa direto com Archer.
-        // PESSOA D: implementar MenuScene → CharacterSelectScene → PlayingScene
         CharacterType defaultCharacter = CharacterType.ARCHER;
         sceneManager.addScene(GameState.PLAYING,
                 new PlayingScene(input, sceneManager,
@@ -49,11 +47,6 @@ public class Game {
                         Constants.WINDOW_WIDTH,
                         Constants.WINDOW_HEIGHT
                 ));
-
-        // Cenas futuras (Pessoa D):
-        // sceneManager.addScene(GameState.MENU, new MenuScene(...));
-        // sceneManager.addScene(GameState.PAUSED, new PauseScene(...));
-        // sceneManager.addScene(GameState.GAME_OVER, new GameOverScene(...));
 
         sceneManager.switchTo(GameState.MENU);
 

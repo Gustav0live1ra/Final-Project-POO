@@ -27,12 +27,12 @@ public class InputHandler implements KeyListener, MouseListener {
     private boolean escPressed;
     private boolean mPressed;
 
-    // === Teclado ===
+    // Teclado
     public boolean isKeyPressed(int keyCode) {
         return pressedKeys.contains(keyCode);
     }
 
-    // Métodos convenientes pras teclas mais usadas
+    // Métodos convenientes para as teclas mais usadas
     public boolean isUp() {
         return isKeyPressed(KeyEvent.VK_W) || isKeyPressed(KeyEvent.VK_UP);
     }
@@ -58,7 +58,7 @@ public class InputHandler implements KeyListener, MouseListener {
         return false;
     }
 
-    // === Mouse ===
+    // Mouse
     public int getMouseX() { return mouseX; }
     public int getMouseY() { return mouseY; }
 
@@ -147,7 +147,7 @@ public class InputHandler implements KeyListener, MouseListener {
         return false; // A tecla não estava pressionada
     }
 
-    // === Implementação das interfaces ===
+    // Implementação das interfaces
     @Override
     public void keyPressed(KeyEvent e) {
 

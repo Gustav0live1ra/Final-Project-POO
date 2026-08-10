@@ -11,7 +11,7 @@ public class GameOverScene implements GameScene {
     private final int viewWidth;
     private final int viewHeight;
 
-    // Variável para animação do texto (opcional)
+    // Variável para animação do texto
     private float pulseTime = 0f;
 
     public GameOverScene(InputHandler input, SceneManager sceneManager, int viewWidth, int viewHeight) {
@@ -128,7 +128,7 @@ public class GameOverScene implements GameScene {
 
 
         // =================================================================
-        // --- BOTÃO INFERIOR ESQUERDO (MENU PRINCIPAL) - NOVO DESIGN ---
+        // --- BOTÃO INFERIOR ESQUERDO (MENU PRINCIPAL) ---
         // =================================================================
         int btnMenuWidth = 180;
         int btnMenuHeight = 40;
@@ -148,7 +148,6 @@ public class GameOverScene implements GameScene {
         g2d.setColor(new Color(255, 220, 150));
         String menuTexto = "[M] Menu Principal";
 
-        // Cálculo centralizado do texto usando sua própria variável de FontMetrics
         FontMetrics fmMenu = g2d.getFontMetrics();
         int menuTextoX = btnMenuX + (btnMenuWidth - fmMenu.stringWidth(menuTexto)) / 2;
         int menuTextoY = btnMenuY + ((btnMenuHeight - fmMenu.getHeight()) / 2) + fmMenu.getAscent();

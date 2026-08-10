@@ -237,7 +237,7 @@ public class PauseScene implements GameScene {
     }
 
     private void drawFooter(Graphics g) {
-        // Rodapé com dicas (igual ao menu)
+        // Rodapé com versão do jogo (igual ao menu)
         g.setFont(new Font("Arial", Font.PLAIN, 14));
         g.setColor(Color.GRAY);
 

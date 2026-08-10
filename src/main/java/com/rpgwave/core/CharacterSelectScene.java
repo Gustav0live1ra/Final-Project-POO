@@ -50,9 +50,7 @@ public class CharacterSelectScene implements GameScene {
 
             if (warriorImage != null && archerImage != null && mageImage != null) {
                 imagesLoaded = true;
-                System.out.println("✅ Imagens carregadas com sucesso!");
             } else {
-                System.out.println("⚠️ Alguma imagem não foi encontrada!");
                 createFallbackImages();
             }
         } catch (IOException e) {
@@ -104,17 +102,17 @@ public class CharacterSelectScene implements GameScene {
         int srcHeight = srcImage.getHeight();
 
         // --- ZOOM PERSONALIZADO PARA CADA CLASSE ---
-        float zoomMultiplier = 1.2f; // Valor padrão (o que ficou bom pro Arqueiro)
+        float zoomMultiplier = 1.2f;
 
         switch (type) {
             case ARCHER:
-                zoomMultiplier = 1.1f; // O Arqueiro já está ótimo assim
+                zoomMultiplier = 1.1f;
                 break;
             case WARRIOR:
-                zoomMultiplier = 0.9f; // O Guerreiro pode chegar mais perto (já que a espada é pra baixo)
+                zoomMultiplier = 0.9f;
                 break;
             case MAGE:
-                zoomMultiplier = 0.88f; // O Mago tem o cajado e mãos mais fechadas no corpo, pode chegar bem perto!
+                zoomMultiplier = 0.88f;
                 break;
         }
 

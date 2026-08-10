@@ -27,4 +27,8 @@ public final class Constants {
 
     // Debug
     public static final boolean DEBUG_MODE = false;
+
+    //background sounds
+    public static final String MENU_SOUND = "/audio/sound_menu.wav";
+    public static final String GAMEPLAY_SOUND = "/audio/sound_gameplay.wav";
 }

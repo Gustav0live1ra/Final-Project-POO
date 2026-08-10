@@ -1,6 +1,7 @@
 package com.rpgwave.core;
 
 import java.awt.*;
+import java.awt.event.KeyEvent;
 
 public class MenuScene implements GameScene {
     private final InputHandler input;
@@ -29,11 +30,11 @@ public class MenuScene implements GameScene {
     @Override
     public void update() {
 
-        if (input.consumeDown()) {
+        if (input.consumeKey(KeyEvent.VK_DOWN)) {
             selectedOption = (selectedOption + 1) % 2;
         }
 
-        if (input.consumeUp()) {
+        if (input.consumeKey(KeyEvent.VK_UP)) {
             selectedOption = (selectedOption - 1 + 2) % 2;
         }
 

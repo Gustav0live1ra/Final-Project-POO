@@ -24,7 +24,7 @@ public class Game {
         canvas.requestFocus();
 
         // Cenas
-        sceneManager = new SceneManager();
+        sceneManager = new SceneManager(input);
 
         CharacterType defaultCharacter = CharacterType.ARCHER;
         sceneManager.addScene(GameState.PLAYING,

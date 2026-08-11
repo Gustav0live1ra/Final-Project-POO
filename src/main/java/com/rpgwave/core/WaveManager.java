@@ -94,9 +94,9 @@ public class WaveManager {
         double x = pos[0];
         double y = pos[1];
 
-        if (type == GoblinEnemy.class) return new GoblinEnemy(x, y, 64, 64, target);
-        if (type == AquaticEnemy.class) return new AquaticEnemy(x, y, 40, 92, target);
-        return new FlyingEnemy(x, y, 96, 96, target);
+        if (type == GoblinEnemy.class) return new GoblinEnemy(x, y, 90, 72, target);
+        if (type == AquaticEnemy.class) return new AquaticEnemy(x, y, 90, 59, target);
+        return new FlyingEnemy(x, y, 90, 48, target);
     }
 
     private double[] findValidSpawnPosition(Class<? extends Enemy> type) {

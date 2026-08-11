@@ -6,7 +6,6 @@ import java.util.Objects;
 
 public class SpriteLoader {
 
-    // Metodo estático pra ser chamado de qualquer lugar
     public static BufferedImage load(String path) {
         try {
             return ImageIO.read(

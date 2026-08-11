@@ -29,7 +29,6 @@ public class GameCanvas extends Canvas {
 
         try {
 
-            // Limpa a tela antes de desenhar uma nova cena
             g.clearRect(
                     0,
                     0,
@@ -37,7 +36,6 @@ public class GameCanvas extends Canvas {
                     getHeight()
             );
 
-            // Desenha a cena atual
             sceneManager.render(g);
 
         } finally {

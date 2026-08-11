@@ -23,4 +23,17 @@ public class Animation {
         }
         return frames[currentFrame];
     }
+
+    public void reset() {
+        currentFrame = 0;
+        lastFrameTime = System.currentTimeMillis();
+    }
+
+    public int getFrameCount() {
+        return frames.length;
+    }
+
+    public long getFrameDurationMs() {
+        return frameDurationMs;
+    }
 }

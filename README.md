@@ -9,14 +9,13 @@ O jogador escolhe entre 3 personagens (Guerreiro, Arqueiro ou Mago) e enfrenta o
 **Controles:**
 - `WASD` — Movimentação
 - `Mouse` — Mira e ataque
-- `ESC` — Pausar (a implementar)
+- `ESC` — Pausar 
 
 ---
 
 ## 🛠️ Tecnologias
 
 - **Java 17**
-- **Swing** (JFrame + Canvas) para renderização
 - **IntelliJ IDEA** como IDE 
 
 Sem dependências externas! É só clonar e rodar.
@@ -27,7 +26,7 @@ Sem dependências externas! É só clonar e rodar.
 
 1. Clone o repositório:
    ```bash
-   git clone https://github.com/SEU-USUARIO/POO-JavaRPG.git
+   git clone https://github.com/Gustav0live1ra/Final-Project-POO.git
 
 2. Abra a pasta no IntelliJ IDEA
 
@@ -48,7 +47,7 @@ Sem dependências externas! É só clonar e rodar.
 
 ## 🧩 Como a Arquitetura Funciona
 
-    Fluxo básico
+    Fluxo básico (desatualizado)
 
     Game (orquestrador)
         ├─ Window (JFrame)
@@ -71,12 +70,15 @@ Sem dependências externas! É só clonar e rodar.
             ├─ Warrior  → ataque corpo a corpo
             ├─ Archer   → atira flechas
             ├─ Mage     → lança magias
-            └─ Enemy    [A implementar]
-
+         └─ Enemy    (abstrata)
+            ├─ goblinEnemy
+            ├─ aquaticEnemy
+            ├─ flyingEnemy
+            ├─ bigBossEnemy
 
 ## 👨‍💻 Equipe
 
-    [Gustavo] — Arquitetura e Núcleo
+    [Gustavo] — Arquitetura, núcleo e audio
     [Élison] — Sistema de RPG e Combate
     [G.Gabriel] — Mundo, sistema de Waves
     [Emanuel] — Interface e Suporte

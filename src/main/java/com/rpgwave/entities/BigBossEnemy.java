@@ -25,6 +25,13 @@ public class BigBossEnemy extends Enemy {
         super.update(worldWidth, worldHeight);
         for (Projectile p : projectiles) {
             p.update(worldWidth, worldHeight);
+
+            if (p.isActive() && p.collidesWith(target)) {
+                if (target instanceof Damageable) {
+                    ((Damageable) target).takeDamage(15);
+                }
+                p.setActive(false);
+            }
         }
         projectiles.removeIf(p -> !p.isActive());
     }

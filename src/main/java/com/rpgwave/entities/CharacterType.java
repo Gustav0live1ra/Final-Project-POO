@@ -1,9 +1,5 @@
 package com.rpgwave.entities;
 
-/**
- * Tipos de personagens disponíveis.
- * Facilita a criação de menus de seleção.
- */
 public enum CharacterType {
     WARRIOR("Guerreiro", "Especialista em combate corpo a corpo. Muito HP e resistência."),
     ARCHER("Arqueiro", "Atira flechas à distância. Ágil e preciso."),

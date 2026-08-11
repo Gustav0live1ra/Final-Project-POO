@@ -17,10 +17,8 @@ public class CharacterSelectScene implements GameScene {
     private final int viewWidth;
     private final int viewHeight;
 
-    // Variáveis para animação
     private float selectionPulse = 0f;
 
-    // ========== IMAGENS DOS PERSONAGENS ==========
     private BufferedImage warriorImage;
     private BufferedImage archerImage;
     private BufferedImage mageImage;
@@ -41,7 +39,6 @@ public class CharacterSelectScene implements GameScene {
         loadImages();
     }
 
-    // ============ METODO PARA CARREGAR IMAGENS ============
     private void loadImages() {
         try {
             warriorImage = ImageIO.read(getClass().getResourceAsStream("/sprites/Guerreiro.png"));
@@ -59,7 +56,6 @@ public class CharacterSelectScene implements GameScene {
         }
     }
 
-    // Imagens de fallback
     private void createFallbackImages() {
         warriorImage = createPlaceholderImage(Color.RED, "G");
         archerImage = createPlaceholderImage(Color.GREEN, "A");
@@ -71,11 +67,9 @@ public class CharacterSelectScene implements GameScene {
         BufferedImage img = new BufferedImage(200, 200, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = img.createGraphics();
 
-        // Fundo redondo
         g2d.setColor(color);
         g2d.fillOval(10, 10, 180, 180);
 
-        // Letra
         g2d.setColor(Color.WHITE);
         g2d.setFont(new Font("Arial", Font.BOLD, 80));
         FontMetrics fm = g2d.getFontMetrics();
@@ -87,7 +81,6 @@ public class CharacterSelectScene implements GameScene {
         return img;
     }
 
-    // ============ METODO COM ZOOM INDIVIDUAL POR PERSONAGEM ============
     private BufferedImage cropToCircle(BufferedImage srcImage, int diameter, CharacterType type) {
         BufferedImage destImage = new BufferedImage(diameter, diameter, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = destImage.createGraphics();
@@ -145,7 +138,6 @@ public class CharacterSelectScene implements GameScene {
 
     @Override
     public void onExit() {
-        // Cleanup
     }
 
     @Override
@@ -196,8 +188,6 @@ public class CharacterSelectScene implements GameScene {
         }
     }
 
-    // ============ METODOS DE DESENHO ============
-
     private void drawBackground(Graphics g){
         Graphics2D g2d = (Graphics2D) g;
 
@@ -239,15 +229,13 @@ public class CharacterSelectScene implements GameScene {
         int centerX = viewWidth / 2;
         int centerY = viewHeight / 2 - 30;
 
-        int circleRadius = 130; // Aumentei um pouco
+        int circleRadius = 130;
         int diameter = circleRadius * 2;
 
-        // Efeito de pulso
         float pulse = 1f + 0.03f * (float) Math.sin(selectionPulse * 2);
         int currentRadius = (int)(circleRadius * pulse);
         int currentDiameter = currentRadius * 2;
 
-        // Glow externo
         int glowAlpha = 30 + 20 * (int)(Math.sin(selectionPulse * 2) * 0.5 + 0.5);
         g.setColor(new Color(255, 215, 0, glowAlpha));
         g.fillOval(
@@ -257,20 +245,16 @@ public class CharacterSelectScene implements GameScene {
                 currentDiameter + 50
         );
 
-        // ========== DESENHA A IMAGEM CIRCULAR ==========
         BufferedImage characterImage = getCharacterImage(selectedCharacter);
 
         if (characterImage != null) {
-            // Corta a imagem em círculo
             BufferedImage circularImage = cropToCircle(characterImage, diameter, selectedCharacter);
 
-            // Desenha a imagem circular
             int imageX = centerX - currentRadius;
             int imageY = centerY - currentRadius;
             g.drawImage(circularImage, imageX, imageY, null);
 
         } else {
-            // Fallback: círculo colorido com inicial
             g.setColor(new Color(40, 40, 50));
             g.fillOval(
                     centerX - currentRadius,
@@ -288,7 +272,6 @@ public class CharacterSelectScene implements GameScene {
             g.drawString(name, x, y);
         }
 
-        // Borda dourada do círculo (por cima da imagem)
         g2d.setColor(new Color(255, 215, 0, 180));
         g2d.setStroke(new BasicStroke(4));
         g2d.drawOval(
@@ -390,8 +373,6 @@ public class CharacterSelectScene implements GameScene {
         int x = (viewWidth - fm.stringWidth(warning)) / 2;
         g.drawString(warning, x, 130);
     }
-
-    // ============ MÉTODOS AUXILIARES ============
 
     private BufferedImage getCharacterImage(CharacterType type){
         switch(type){

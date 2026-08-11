@@ -33,14 +33,12 @@ public class GameOverScene implements GameScene {
     public void update() {
         pulseTime += 0.05f;
 
-        // 1. Se apertar ENTER -> TENTAR NOVAMENTE
         if (input.consumeEnter()) {
             sceneManager.addScene(GameState.PLAYING,
                     new PlayingScene(input, sceneManager, viewWidth, viewHeight, Game.currentCharacter));
             sceneManager.switchTo(GameState.PLAYING);
         }
 
-        // 2. Se apertar M -> MENU PRINCIPAL
         if (input.consumeM()) {
             sceneManager.switchTo(GameState.MENU);
         }
@@ -54,11 +52,9 @@ public class GameOverScene implements GameScene {
         int centerX = viewWidth / 2;
         int centerY = viewHeight / 2;
 
-        // --- FUNDO PRETO SÓLIDO ---
         g2d.setColor(Color.BLACK);
         g2d.fillRect(0, 0, viewWidth, viewHeight);
 
-        // --- PAINEL (Mini tela) ---
         int panelWidth = 500;
         int panelHeight = 400;
         int panelX = centerX - (panelWidth / 2);
@@ -72,7 +68,6 @@ public class GameOverScene implements GameScene {
         g2d.setStroke(new BasicStroke(3));
         g2d.drawRoundRect(panelX, panelY, panelWidth, panelHeight, 20, 20);
 
-        // --- TÍTULO ---
         g2d.setFont(new Font("Serif", Font.BOLD, 55));
         String titulo = "GAME OVER";
         FontMetrics fmTitulo = g2d.getFontMetrics();
@@ -84,7 +79,6 @@ public class GameOverScene implements GameScene {
         g2d.setColor(new Color(200, 0, 0, 100));
         g2d.fillRect(centerX - 80, panelY + 80, 160, 2);
 
-        // --- SUBTÍTULO DRAMÁTICO ---
         float pulseAlpha = 0.6f + 0.4f * (float) Math.sin(pulseTime * 2);
         int alpha = (int) (150 * pulseAlpha);
         g2d.setFont(new Font("Arial", Font.PLAIN, 16));
@@ -93,34 +87,27 @@ public class GameOverScene implements GameScene {
         FontMetrics fmSub = g2d.getFontMetrics();
         g2d.drawString(sub, centerX - (fmSub.stringWidth(sub) / 2), panelY + 105);
 
-        // =================================================================
-        // --- BOTÃO CENTRAL (TENTAR NOVAMENTE) ---
-        // =================================================================
         int btnRestartWidth = 340;
         int btnRestartHeight = 55;
         int btnRestartX = centerX - (btnRestartWidth / 2);
         int btnRestartY = panelY + 140;
 
-        // Desenha a caixa vermelha
         g2d.setColor(new Color(120, 0, 0, 200));
         g2d.fillRoundRect(btnRestartX, btnRestartY, btnRestartWidth, btnRestartHeight, 10, 10);
         g2d.setColor(new Color(255, 50, 50, 180));
         g2d.setStroke(new BasicStroke(2));
         g2d.drawRoundRect(btnRestartX, btnRestartY, btnRestartWidth, btnRestartHeight, 10, 10);
 
-        // Configurações de fonte e cor
         g2d.setColor(new Color(255, 220, 220));
         g2d.setFont(new Font("Arial", Font.BOLD, 24));
         int centerYButton = btnRestartY + (btnRestartHeight / 2);
         FontMetrics fmRestart = g2d.getFontMetrics();
 
-        // Desenha o ícone da seta
         String icon = "↻";
         int iconX = btnRestartX + 30;
         int iconY = centerYButton + (fmRestart.getAscent() / 2) - 2;
         g2d.drawString(icon, iconX, iconY);
 
-        // Desenha o texto ao lado do ícone
         String restart = "JOGAR NOVAMENTE";
         int textoX = iconX + fmRestart.stringWidth(icon) + 15;
         int textoY = centerYButton + (fmRestart.getAscent() / 2) - 2;
@@ -135,15 +122,12 @@ public class GameOverScene implements GameScene {
         int btnMenuX = panelX + 20;
         int btnMenuY = panelY + panelHeight - 60;
 
-        // Fundo marrom do botão
         g2d.setColor(new Color(100, 70, 30, 200));
         g2d.fillRoundRect(btnMenuX, btnMenuY, btnMenuWidth, btnMenuHeight, 8, 8);
-        // Borda amarela
         g2d.setColor(new Color(200, 170, 100, 180));
         g2d.setStroke(new BasicStroke(2));
         g2d.drawRoundRect(btnMenuX, btnMenuY, btnMenuWidth, btnMenuHeight, 8, 8);
 
-        // Texto do botão com a tecla
         g2d.setFont(new Font("Arial", Font.PLAIN, 18));
         g2d.setColor(new Color(255, 220, 150));
         String menuTexto = "[M] Menu Principal";

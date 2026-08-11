@@ -47,9 +47,7 @@ public class CharacterSelectScene implements GameScene {
 
             if (warriorImage != null && archerImage != null && mageImage != null) {
                 imagesLoaded = true;
-                System.out.println("✅ Imagens carregadas com sucesso!");
             } else {
-                System.out.println("⚠️ Alguma imagem não foi encontrada!");
                 createFallbackImages();
             }
         } catch (IOException e) {
@@ -96,6 +94,7 @@ public class CharacterSelectScene implements GameScene {
         int srcWidth = srcImage.getWidth();
         int srcHeight = srcImage.getHeight();
 
+        // --- ZOOM PERSONALIZADO PARA CADA CLASSE ---
         float zoomMultiplier = 1.2f;
 
         switch (type) {

@@ -11,6 +11,7 @@ public class GameOverScene implements GameScene {
     private final int viewWidth;
     private final int viewHeight;
 
+    // Variável para animação do texto
     private float pulseTime = 0f;
 
     public GameOverScene(InputHandler input, SceneManager sceneManager, int viewWidth, int viewHeight) {
@@ -112,6 +113,10 @@ public class GameOverScene implements GameScene {
         int textoY = centerYButton + (fmRestart.getAscent() / 2) - 2;
         g2d.drawString(restart, textoX, textoY);
 
+
+        // =================================================================
+        // --- BOTÃO INFERIOR ESQUERDO (MENU PRINCIPAL) ---
+        // =================================================================
         int btnMenuWidth = 180;
         int btnMenuHeight = 40;
         int btnMenuX = panelX + 20;

@@ -11,4 +11,15 @@ public class SpriteSheet {
         }
         return frames;
     }
+
+    public static BufferedImage[] sliceRowCropped(BufferedImage sheet, int row, int frameCount,
+            int cellWidth, int cellHeight, int cropX, int cropY, int cropWidth, int cropHeight) {
+        BufferedImage[] frames = new BufferedImage[frameCount];
+        for (int i = 0; i < frameCount; i++) {
+            int baseX = i * cellWidth;
+            int baseY = row * cellHeight;
+            frames[i] = sheet.getSubimage(baseX + cropX, baseY + cropY, cropWidth, cropHeight);
+        }
+        return frames;
+    }
 }

@@ -13,17 +13,16 @@ public class Game {
     private final GameLoop gameLoop;
 
     public Game() {
-        // Canvas e janela
+
         canvas = new GameCanvas();
         window = new Window(canvas);
 
-        // Input (registra listeners no canvas)
         input = new InputHandler();
         canvas.addKeyListener(input);
         canvas.addMouseListener(input);
+        canvas.addMouseMotionListener(input);
         canvas.requestFocus();
 
-        // Cenas
         sceneManager = new SceneManager(input);
 
         CharacterType defaultCharacter = CharacterType.ARCHER;
@@ -50,7 +49,6 @@ public class Game {
 
         sceneManager.switchTo(GameState.MENU);
 
-        // Loop
         gameLoop = new GameLoop(this);
     }
 

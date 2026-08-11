@@ -1,59 +1,61 @@
 package com.rpgwave.entities;
 
-import com.rpgwave.utils.Constants;
-import com.rpgwave.utils.SpriteLoader;
+import com.rpgwave.utils.Animation;
+import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
 public class PlayerProjectile extends Entity {
 
-    private final Direction direction;
-    private final int speed;
-    private final int damage;
-    private final BufferedImage sprite;
+    private final double vx, vy;
+    private final Animation animation;
+    private final double spriteBaseAngleDeg;
+
+    private final Character owner;
+    private final Skill skill;
+    private boolean hasHit = false;
 
     public PlayerProjectile(
             double startX,
             double startY,
-            Direction direction,
-            int damage,
+            double dirX,
+            double dirY,
             int speed,
-            String spritePath) {
+            int width,
+            int height,
+            BufferedImage[] frames,
+            long frameDurationMs,
+            double spriteBaseAngleDeg,
+            Character owner,
+            Skill skill) {
 
-        super(
-                startX,
-                startY,
-                Constants.PROJECTILE_WIDTH,
-                Constants.PROJECTILE_HEIGHT
-        );
+        super(startX, startY, width, height);
 
-        this.direction = direction;
-        this.damage = damage;
-        this.speed = speed;
-        this.sprite = null;
+        double len = Math.sqrt(dirX * dirX + dirY * dirY);
+        if (len == 0) {
+            dirX = 1;
+            dirY = 0;
+            len = 1;
+        }
+
+        this.vx = (dirX / len) * speed;
+        this.vy = (dirY / len) * speed;
+
+        this.animation = (frames != null && frames.length > 0)
+                ? new Animation(frames, frameDurationMs)
+                : null;
+        this.spriteBaseAngleDeg = spriteBaseAngleDeg;
+        this.owner = owner;
+        this.skill = skill;
     }
 
     @Override
     public void update(int worldWidth, int worldHeight) {
 
-        switch (direction) {
-
-            case UP:
-                position.setY(position.getY() - speed);
-                break;
-
-            case DOWN:
-                position.setY(position.getY() + speed);
-                break;
-
-            case LEFT:
-                position.setX(position.getX() - speed);
-                break;
-
-            case RIGHT:
-                position.setX(position.getX() + speed);
-                break;
-        }
+        position.setX(position.getX() + vx);
+        position.setY(position.getY() + vy);
 
         if (position.getX() + width < 0
                 || position.getX() > worldWidth
@@ -64,20 +66,47 @@ public class PlayerProjectile extends Entity {
         }
     }
 
+    public int computeDamageAndConsume(int enemyDefense) {
+        if (hasHit || owner == null) {
+            return 0;
+        }
+        hasHit = true;
+        active = false;
+
+        if (skill != null) {
+            return DamageCalculator.calculateDamage(
+                    owner.getStats().getAttack(), skill, enemyDefense);
+        }
+
+        return SkillManager.calculateBasicAttackDamage(owner, enemyDefense);
+    }
+
+    private double directionAngleDeg() {
+        return Math.toDegrees(Math.atan2(vy, vx));
+    }
+
     @Override
     public void render(Graphics g) {
 
-        g.setColor(java.awt.Color.YELLOW);
+        if (animation == null) {
+            g.setColor(Color.YELLOW);
+            g.fillOval((int) position.getX(), (int) position.getY(), width, height);
+            return;
+        }
 
-        g.fillOval(
-                (int) position.getX(),
-                (int) position.getY(),
-                width,
-                height
-        );
-    }
+        BufferedImage frame = animation.getCurrentFrame();
+        double rotationDeg = directionAngleDeg() - spriteBaseAngleDeg;
 
-    public int getDamage() {
-        return damage;
+        Graphics2D g2d = (Graphics2D) g;
+        AffineTransform previousTransform = g2d.getTransform();
+
+        double centerX = position.getX() + width / 2.0;
+        double centerY = position.getY() + height / 2.0;
+
+        g2d.translate(centerX, centerY);
+        g2d.rotate(Math.toRadians(rotationDeg));
+        g2d.drawImage(frame, -width / 2, -height / 2, width, height, null);
+
+        g2d.setTransform(previousTransform);
     }
 }

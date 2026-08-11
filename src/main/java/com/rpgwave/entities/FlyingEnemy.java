@@ -8,6 +8,13 @@ import java.awt.image.BufferedImage;
 
 public class FlyingEnemy extends Enemy {
 
+    // Layout dos sheets Bat_*.png (Tiny RPG Character Asset Pack, Zerie):
+    private static final int CELL_SIZE = 100;
+    private static final int CROP_X = 35;
+    private static final int CROP_Y = 32;
+    private static final int CROP_W = 45;
+    private static final int CROP_H = 24;
+
     private boolean dashing = false;
     private double dashDirX, dashDirY;
     private final double dashSpeed = 8.0;
@@ -23,10 +30,15 @@ public class FlyingEnemy extends Enemy {
         this.placeholderColor = Color.CYAN;
         this.attackCooldownMs = 1500;
 
-        BufferedImage sheet = SpriteLoader.load("/sprites/flying_eye_sheet.png");
-        animations.put(State.IDLE, new Animation(SpriteSheet.sliceRow(sheet, 0, 12, 192, 192), 80));
-        animations.put(State.CHASE, new Animation(SpriteSheet.sliceRow(sheet, 0, 12, 192, 192), 60));
-        animations.put(State.ATTACK, new Animation(SpriteSheet.sliceRow(sheet, 1, 8, 192, 192), 50));
+        BufferedImage flyingSheet = SpriteLoader.load("/sprites/Bat_Flying.png");
+        BufferedImage attackSheet = SpriteLoader.load("/sprites/Bat_Attack01.png");
+
+        animations.put(State.IDLE, new Animation(
+                SpriteSheet.sliceRowCropped(flyingSheet, 0, 6, CELL_SIZE, CELL_SIZE, CROP_X, CROP_Y, CROP_W, CROP_H), 100));
+        animations.put(State.CHASE, new Animation(
+                SpriteSheet.sliceRowCropped(flyingSheet, 0, 6, CELL_SIZE, CELL_SIZE, CROP_X, CROP_Y, CROP_W, CROP_H), 70));
+        animations.put(State.ATTACK, new Animation(
+                SpriteSheet.sliceRowCropped(attackSheet, 0, 6, CELL_SIZE, CELL_SIZE, CROP_X, CROP_Y, CROP_W, CROP_H), 50));
     }
 
     @Override

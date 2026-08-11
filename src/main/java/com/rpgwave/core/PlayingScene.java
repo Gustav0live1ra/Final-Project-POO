@@ -30,20 +30,20 @@ public class PlayingScene implements GameScene {
 
     private Character player;
     private WaveManager waveManager;
-    private CopyOnWriteArrayList<Projectile> projectiles;
+    private CopyOnWriteArrayList<PlayerProjectile> playerProjectiles;
 
     private TileMap tileMap;
     private Camera camera;
     private int worldPixelWidth;
     private int worldPixelHeight;
 
-
-    // Cooldown de Ataque Temporário
     private long lastBasicAttackTime = 0;
     private long lastSkillAttackTime = 0;
 
     private static final long BASIC_ATTACK_COOLDOWN = 300;
     private static final long SKILL_ATTACK_COOLDOWN = 700;
+
+    private static final int PLAYER_PROJECTILE_SPEED = 9;
 
     public PlayingScene(
             InputHandler input,
@@ -67,9 +67,8 @@ public class PlayingScene implements GameScene {
 
         gameInitialized = true;
 
-        projectiles = new CopyOnWriteArrayList<>();
+        playerProjectiles = new CopyOnWriteArrayList<>();
 
-        // Carrega o mapa
         tileMap = TmxLoader.load(
                 "/maps/mapa_principal.tmx",
                 "/maps/"
@@ -81,10 +80,8 @@ public class PlayingScene implements GameScene {
         worldPixelHeight =
                 tileMap.height * tileMap.tileHeight * TileMap.SCALE;
 
-        // Procura uma posição segura para o personagem
         double[] spawn = findSafeSpawn();
 
-        // Cria o personagem escolhido
         player = CharacterFactory.create(
                 chosenCharacter,
                 spawn[0],
@@ -92,8 +89,6 @@ public class PlayingScene implements GameScene {
                 input
         );
 
-
-        // Cria a câmera
         camera = new Camera(
                 viewWidth,
                 viewHeight,
@@ -101,7 +96,6 @@ public class PlayingScene implements GameScene {
                 worldPixelHeight
         );
 
-        // Cria o sistema de ondas usando o personagem como alvo
         waveManager = new WaveManager(
                 player,
                 worldPixelWidth,
@@ -139,14 +133,77 @@ public class PlayingScene implements GameScene {
 
     @Override
     public void onExit() {
-        if (projectiles != null) {
-            projectiles.clear();
+        if (playerProjectiles != null) {
+            playerProjectiles.clear();
+        }
+    }
+
+    private double[] aimVectorTowardsMouse() {
+        double worldMouseX = input.getMouseX() + camera.getX();
+        double worldMouseY = input.getMouseY() + camera.getY();
+
+        return new double[]{
+                worldMouseX - player.getCenterX(),
+                worldMouseY - player.getCenterY()
+        };
+    }
+
+    private void spawnPlayerProjectile(double aimX, double aimY, Skill skill) {
+        int projWidth = player.getProjectileWidth();
+        int projHeight = player.getProjectileHeight();
+
+        double startX = player.getCenterX() - projWidth / 2.0;
+        double startY = player.getCenterY() - projHeight / 2.0;
+
+        playerProjectiles.add(new PlayerProjectile(
+                startX,
+                startY,
+                aimX,
+                aimY,
+                PLAYER_PROJECTILE_SPEED,
+                projWidth,
+                projHeight,
+                player.getProjectileFrames(),
+                player.getProjectileFrameDurationMs(),
+                player.getProjectileBaseAngleDeg(),
+                player,
+                skill
+        ));
+    }
+
+    private void meleeHit(Skill skill) {
+        double attackRange = 100;
+
+        for (Enemy e : waveManager.getActiveEnemies()) {
+
+            double dx = e.getCenterX() - player.getCenterX();
+            double dy = e.getCenterY() - player.getCenterY();
+            double dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist >= attackRange) continue;
+
+            int damage = (skill != null)
+                    ? DamageCalculator.calculateDamage(player.getStats().getAttack(), skill, e.getDefense())
+                    : SkillManager.calculateBasicAttackDamage(player, e.getDefense());
+
+            e.takeDamage(damage);
+
+            if (e.isDead()) {
+                player.getStats().restoreMana(5);
+                player.addExperience(e.getExperienceReward());
+                System.out.println("Inimigo derrotado! +" + e.getExperienceReward() + " XP");
+            }
+
+            System.out.println(
+                    (skill != null ? "Skill: " + skill.getName() : "Ataque básico") +
+                            " | Dano causado: " + damage +
+                            " | Mana: " + player.getStats().getCurrentMana()
+            );
         }
     }
 
     @Override
     public void update() {
-        // Pausa do jogo
         if (input.consumeEscape()){
             sceneManager.switchTo(GameState.PAUSED);
             return;
@@ -157,14 +214,11 @@ public class PlayingScene implements GameScene {
             return;
         }
 
-        // Guarda a posição anterior
         double prevX = player.getPosition().getX();
         double prevY = player.getPosition().getY();
 
-        // Atualiza o personagem
         player.update(worldPixelWidth, worldPixelHeight);
 
-        // Impede o personagem de atravessar áreas sólidas
         if (tileMap.isSolidAt(
                 player.getCenterX(),
                 player.getCenterY())) {
@@ -173,149 +227,87 @@ public class PlayingScene implements GameScene {
             player.getPosition().setY(prevY);
         }
 
-        // Faz a câmera seguir o personagem
         camera.follow(player);
 
-        // Atualiza inimigos e ondas
         waveManager.update(
                 worldPixelWidth,
                 worldPixelHeight
         );
 
-        // Atualiza projéteis
-        for (Projectile p : projectiles) {
+        for (PlayerProjectile p : playerProjectiles) {
             p.update(worldPixelWidth, worldPixelHeight);
         }
-        projectiles.removeIf(p -> !p.isActive());
 
-        // Ataque temporário de teste
+        // O dano só acontece AQUI — quando a flecha/bola de fogo realmente
+        for (PlayerProjectile p : playerProjectiles) {
+            if (!p.isActive()) continue;
+
+            for (Enemy e : waveManager.getActiveEnemies()) {
+                if (e.isDead()) continue;
+
+                if (p.collidesWith(e)) {
+                    int damage = p.computeDamageAndConsume(e.getDefense());
+
+                    if (damage > 0) {
+                        e.takeDamage(damage);
+
+                        if (e.isDead()) {
+                            player.getStats().restoreMana(5);
+                            player.addExperience(e.getExperienceReward());
+                            System.out.println("Inimigo derrotado! +" + e.getExperienceReward() + " XP");
+                        }
+
+                        System.out.println("Acerto! Dano causado: " + damage);
+                    }
+
+                    break;
+                }
+            }
+        }
+        playerProjectiles.removeIf(p -> !p.isActive());
+
         if (input.consumeMouseClick()) {
             long currentTime = System.currentTimeMillis();
 
             if (currentTime - lastBasicAttackTime >= BASIC_ATTACK_COOLDOWN) {
-
                 lastBasicAttackTime = currentTime;
-            }
 
-            lastBasicAttackTime = currentTime;
+                player.triggerAttackAnimation(420);
 
-            int damage = SkillManager.calculateBasicAttackDamage(
-                    player,
-                    0
-            );
-
-            double attackRange = 100;
-
-            for (Enemy e : waveManager.getActiveEnemies()) {
-
-                double dx = e.getCenterX() - player.getCenterX();
-                double dy = e.getCenterY() - player.getCenterY();
-
-                double dist = Math.sqrt(dx * dx + dy * dy);
-
-                if (dist < attackRange) {
-
-                    int enemydamage = SkillManager.calculateBasicAttackDamage(
-                            player,
-                            e.getDefense()
-                    );
-
-                    e.takeDamage(damage);
-
-                    // Recupera mana ao derrotar um inimigo
-                    if (e.isDead()) {
-
-                        player.getStats().restoreMana(5);
-
-                        player.addExperience(e.getExperienceReward());
-
-                        System.out.println(
-                                "Inimigo derrotado! +" +
-                                        e.getExperienceReward() +
-                                        " XP"
-                        );
-                    }
-
-                    System.out.println(
-                            "Ataque básico" +
-                                    " | Dano causado: " + damage +
-                                    " | Mana: " +
-                                    player.getStats().getCurrentMana()
-                    );
+                if (player.getProjectileFrames() != null) {
+                    double[] aim = aimVectorTowardsMouse();
+                    spawnPlayerProjectile(aim[0], aim[1], null);
+                } else {
+                    meleeHit(null);
                 }
             }
         }
 
         if (input.consumeSkillKey()) {
-
             long currentTime = System.currentTimeMillis();
+            Skill skill = player.getSkills().get(0);
 
-            if (currentTime - lastSkillAttackTime < SKILL_ATTACK_COOLDOWN) {
-                    lastBasicAttackTime = currentTime;
-            }
+            boolean offCooldown = currentTime - lastSkillAttackTime >= SKILL_ATTACK_COOLDOWN;
 
-            double attackRange = 100;
+            if (offCooldown && SkillManager.useSkill(player, skill)) {
+                lastSkillAttackTime = currentTime;
 
-            for (Enemy e : waveManager.getActiveEnemies()) {
-
-                double dx = e.getCenterX() - player.getCenterX();
-                double dy = e.getCenterY() - player.getCenterY();
-
-                double dist = Math.sqrt(dx * dx + dy * dy);
-
-                if (dist < attackRange) {
-
-                    Skill skill = player.getSkills().get(0);
-
-                    int damage = SkillManager.useSkillAndCalculateDamage(
-                            player,
-                            skill,
-                            e.getDefense()
-                    );
-
-                    if (damage > 0) {
-                        lastSkillAttackTime = currentTime;
-
-                        e.takeDamage(damage);
-
-                        // Recupera mana e aumenta o level do player
-                        if (e.isDead()) {
-
-                            player.getStats().restoreMana(5);
-
-                            player.addExperience(e.getExperienceReward());
-
-                            System.out.println(
-                                    "Inimigo derrotado! +" +
-                                            e.getExperienceReward() +
-                                            " XP"
-                            );
-                        }
-
-                        System.out.println(
-                                "Skill: " + skill.getName() +
-                                        " | Dano causado: " + damage +
-                                        " | Mana restante: " +
-                                        player.getStats().getCurrentMana()
-                        );
-
-                    } else {
-
-                        System.out.println(
-                                "Mana insuficiente para usar: "
-                                        + skill.getName()
-                        );
-                    }
+                if (player.getProjectileFrames() != null) {
+                    double[] aim = aimVectorTowardsMouse();
+                    spawnPlayerProjectile(aim[0], aim[1], skill);
+                } else {
+                    meleeHit(skill);
                 }
+
+            } else if (offCooldown) {
+                System.out.println("Mana insuficiente para usar: " + skill.getName());
             }
         }
     }
 
-
     @Override
     public void render(Graphics g) {
 
-        // Fundo
         g.setColor(Color.BLACK);
         g.fillRect(
                 0,
@@ -324,7 +316,6 @@ public class PlayingScene implements GameScene {
                 viewHeight
         );
 
-        // Desenha o chão
         tileMap.render(
                 g,
                 camera.getX(),
@@ -334,31 +325,24 @@ public class PlayingScene implements GameScene {
                 GROUND_LAYERS
         );
 
-        // Entra no espaço do mundo
         g.translate(
                 -camera.getX(),
                 -camera.getY()
         );
 
-        // Personagem
         player.render(g);
 
-        // Inimigos
         waveManager.render(g);
 
-        // Projéteis
-        for (Projectile p : projectiles) {
+        for (PlayerProjectile p : playerProjectiles) {
             p.render(g);
         }
 
-
-        // Volta para coordenadas da tela
         g.translate(
                 camera.getX(),
                 camera.getY()
         );
 
-        // Desenha detalhes que ficam por cima
         tileMap.render(
                 g,
                 camera.getX(),
@@ -368,7 +352,6 @@ public class PlayingScene implements GameScene {
                 OVERHEAD_LAYERS
         );
 
-        // HUD
         g.setColor(Color.WHITE);
 
         g.drawString(
@@ -394,6 +377,4 @@ public class PlayingScene implements GameScene {
                 60
         );
     }
-
-    private boolean gameOver = false;
 }

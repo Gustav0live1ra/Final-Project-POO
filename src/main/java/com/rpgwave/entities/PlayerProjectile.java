@@ -102,25 +102,6 @@ public class PlayerProjectile extends Entity {
         }
     }
 
-    public int computeDamageAndConsume(int enemyDefense) {
-        if (hasHit || owner == null) {
-            return 0;
-        }
-        hasHit = true;
-        active = false;
-
-        if (skill != null) {
-            return DamageCalculator.calculateDamage(
-                    owner.getStats().getAttack(), skill, enemyDefense);
-        }
-
-        return SkillManager.calculateBasicAttackDamage(owner, enemyDefense);
-    }
-
-    private double directionAngleDeg() {
-        return Math.toDegrees(Math.atan2(vy, vx));
-    }
-
     @Override
     public void render(Graphics g) {
 
@@ -167,6 +148,7 @@ public class PlayerProjectile extends Entity {
         }
     }
 
-        g2d.setTransform(previousTransform);
+    public int getDamage() {
+        return damage;
     }
 }

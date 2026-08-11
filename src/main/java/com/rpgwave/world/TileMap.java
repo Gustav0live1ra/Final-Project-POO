@@ -43,7 +43,7 @@ public class TileMap {
     private boolean isBlockingTile(int gid) {
         if (gid == 0) return false;
         Tileset ts = findTileset(gid);
-        if (ts == null) return false;
+        if (ts == null) return false; // tileset não carregado -> não bloqueia, só não desenha
         return !ts.isBlank(gid);
     }
 

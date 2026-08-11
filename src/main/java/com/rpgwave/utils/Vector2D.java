@@ -14,6 +14,7 @@ public class Vector2D {
         this(0, 0);
     }
 
+    // Retorna um novo vetor normalizado (magnitude 1)
     public Vector2D normalize() {
         double mag = magnitude();
         if (mag == 0){

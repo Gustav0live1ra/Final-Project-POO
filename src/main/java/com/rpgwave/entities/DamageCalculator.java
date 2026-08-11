@@ -1,5 +1,7 @@
 package com.rpgwave.entities;
 
+// Pessoa B: responsável pelo cálculo do dano dos ataques.
+
 public class DamageCalculator {
 
     public static int calculateDamage(

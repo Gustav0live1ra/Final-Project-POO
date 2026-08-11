@@ -36,7 +36,7 @@ public class SceneManager {
         currentState = state;
         audioManager.onSceneChanged(state);
 
-        input.clearAllInputs();
+        input.clearAllInputs(); //limpa o buffer de entrada a cada mudança de cena
         currentScene.onEnter();
     }
 

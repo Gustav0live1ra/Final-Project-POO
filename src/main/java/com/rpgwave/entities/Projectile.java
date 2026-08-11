@@ -17,6 +17,7 @@ public class Projectile extends Entity {
 
         this.sprite = SpriteLoader.load(Constants.PROJECTILE_SPRITE);
 
+        // Calcula direção usando Vector2D
         Vector2D direction = new Vector2D(
                 targetX - startX,
                 targetY - startY
@@ -29,6 +30,7 @@ public class Projectile extends Entity {
     public void update(int worldWidth, int worldHeight) {
         position = position.add(velocity);
 
+        // Desativa quando sai da tela
         if (position.getX() + width < 0 || position.getX() > worldWidth ||
                 position.getY() + height < 0 || position.getY() > worldHeight) {
             active = false;

@@ -1,5 +1,7 @@
 package com.rpgwave.entities;
 
+// Pessoa B: representa uma habilidade de um personagem.
+
 public class Skill {
 
     private final String name;

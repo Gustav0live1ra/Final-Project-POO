@@ -1,5 +1,7 @@
 package com.rpgwave.entities;
 
+// Pessoa B: responsável pela experiência e evolução do personagem.
+
 public class LevelSystem {
 
     private int level;

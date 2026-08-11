@@ -20,6 +20,7 @@ public abstract class Entity {
     public abstract void update(int worldWidth, int worldHeight);
     public abstract void render(Graphics g);
 
+    // Colisão AABB
     public boolean collidesWith(Entity other) {
         return position.getX() < other.position.getX() + other.width &&
                 position.getX() + width > other.position.getX() &&
@@ -27,6 +28,7 @@ public abstract class Entity {
                 position.getY() + height > other.position.getY();
     }
 
+    // Getters/Setters
     public Vector2D getPosition() { return position; }
     public int getWidth() { return width; }
     public int getHeight() { return height; }

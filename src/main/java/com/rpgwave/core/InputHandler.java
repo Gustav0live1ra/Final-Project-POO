@@ -4,13 +4,16 @@ import java.awt.event.*;
 import java.util.HashSet;
 import java.util.Set;
 
-public class InputHandler implements KeyListener, MouseListener, MouseMotionListener {
+public class InputHandler implements KeyListener, MouseListener {
 
+    // fonte da verdade para o teclado
     private final Set<Integer> pressedKeys = new HashSet<>();
 
+    // Mouse
     private int mouseX, mouseY;
     private boolean mouseClicked;
 
+    // === Teclado (Movimentação Contínua) ===
     public boolean isKeyPressed(int keyCode) {
         return pressedKeys.contains(keyCode);
     }
@@ -20,19 +23,25 @@ public class InputHandler implements KeyListener, MouseListener, MouseMotionList
     public boolean isLeft() { return isKeyPressed(KeyEvent.VK_A) || isKeyPressed(KeyEvent.VK_LEFT); }
     public boolean isRight() { return isKeyPressed(KeyEvent.VK_D) || isKeyPressed(KeyEvent.VK_RIGHT); }
 
+
+    // === Teclado (Ações Únicas / Consumíveis) ===
+
     public boolean consumeKey(int keyCode) {
         if (pressedKeys.contains(keyCode)) {
-            pressedKeys.remove(keyCode);
+            pressedKeys.remove(keyCode); // Remove do Set, garantindo que só rode 1 vez
             return true;
         }
         return false;
     }
 
+    // Métodos de atalho que usam o consumeKey base:
     public boolean consumeSkillKey() { return consumeKey(KeyEvent.VK_Q); }
     public boolean consumeEnter()    { return consumeKey(KeyEvent.VK_ENTER); }
     public boolean consumeEscape()   { return consumeKey(KeyEvent.VK_ESCAPE); }
     public boolean consumeM()        { return consumeKey(KeyEvent.VK_M); }
 
+
+    // === Mouse ===
     public int getMouseX() { return mouseX; }
     public int getMouseY() { return mouseY; }
 
@@ -44,19 +53,21 @@ public class InputHandler implements KeyListener, MouseListener, MouseMotionList
         return false;
     }
 
+    // === LIMPEZA (Chamado pelo SceneManager) ===
     public void clearAllInputs() {
-        pressedKeys.clear();
+        pressedKeys.clear(); // Esvazia a lista de teclas com 1 comando!
         mouseClicked = false;
     }
 
+    // === Implementação das interfaces (Eventos do SO) ===
     @Override
     public void keyPressed(KeyEvent e) {
-        pressedKeys.add(e.getKeyCode());
+        pressedKeys.add(e.getKeyCode()); // Só adiciona e pronto!
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
-        pressedKeys.remove(e.getKeyCode());
+        pressedKeys.remove(e.getKeyCode()); // Se soltou a tecla, some da lista.
     }
 
     @Override
@@ -73,18 +84,4 @@ public class InputHandler implements KeyListener, MouseListener, MouseMotionList
     @Override public void mouseReleased(MouseEvent e) {}
     @Override public void mouseEntered(MouseEvent e) {}
     @Override public void mouseExited(MouseEvent e) {}
-
-    // Rastreiam a posição do mouse mesmo sem clicar, pra mira em tempo real
-    // (flecha do Arqueiro, bola de fogo do Mago, etc. seguem o cursor).
-    @Override
-    public void mouseMoved(MouseEvent e) {
-        mouseX = e.getX();
-        mouseY = e.getY();
-    }
-
-    @Override
-    public void mouseDragged(MouseEvent e) {
-        mouseX = e.getX();
-        mouseY = e.getY();
-    }
 }

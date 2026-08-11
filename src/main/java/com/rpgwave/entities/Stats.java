@@ -1,5 +1,7 @@
 package com.rpgwave.entities;
 
+//Pessoa B: Atributos base de qualquer personagem(vida, velocidade, dano, etc)
+
 public class Stats {
 
     private int maxHealth;
@@ -9,6 +11,8 @@ public class Stats {
     private int attack;
     private int defense;
     private double speed;
+
+
 
     public Stats(int maxHealth, int maxMana, int attack, int defense, double speed) {
         this.maxHealth = maxHealth;
@@ -132,6 +136,12 @@ public class Stats {
 
         defense += amount;
     }
+
+
+
+
+
+
 
 }
 
